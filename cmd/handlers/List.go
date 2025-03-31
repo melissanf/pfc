@@ -2,7 +2,7 @@ package handlers
 import (
 	"net/http"
 )
-func list(res http.ResponseWriter, req *http.Request){
+func List(res http.ResponseWriter, req *http.Request){
 	session, _ := store.Get(req, "session-name")
 	users, err := GetAllUsers(db)
     if err != nil {

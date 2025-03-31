@@ -17,9 +17,9 @@ type User struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Mdp string `json:"mdp"`
-	Grade string `json:"Grade"`
-	Year_entrance string `json:"Year_entrance"`
-	Speciality string `json:"Speciality"`
+	Grade string `json:"grade"`
+	Year_entrance string `json:"year_entrance"`
+	Speciality string `json:"speciality"`
     Isadmin bool `json:"Isadmin"`
 }
 type Fiche struct{
@@ -35,7 +35,7 @@ type Pagedata struct {
 	Users []User 
 }
 func GetAllUsers(db *sql.DB) ([]User, error) {
-    query := "SELECT  name, email, isAdmin FROM users"
+    query := "SELECT  name, email, speciality, grade,  year_entrance,  isAdmin FROM users"
     rows, err := db.Query(query)
     if err != nil {
         return nil, err
@@ -45,7 +45,7 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
     var users []User
     for rows.Next() {
         var user User
-        err := rows.Scan(&user.Name, &user.Email, &user.Isadmin)
+        err := rows.Scan(&user.Name, &user.Email, &user.Speciality, &user.Grade, &user.Year_entrance, &user.Isadmin)
         if err != nil {
             return nil, err
         }
@@ -110,17 +110,7 @@ func VerifyUser(db *sql.DB, identifier, password string) (bool, bool, string) {
 		return false, false, "Incorrect password."
 	}
 }
-func InitDB() {
-	var err error
-	db, err = sql.Open("mysql", "root:ilyesgamer2005@@tcp(localhost:3306)/db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err = db.Ping(); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Connected to the database")
-}
+
 func ValidateInput(user User) (bool, string) {
 	// Vérification des champs vides
 	if user.Name == "" || user.Email == "" || user.Mdp == "" || user.Year_entrance == "" || user.Grade == "" || user.Speciality == ""  {

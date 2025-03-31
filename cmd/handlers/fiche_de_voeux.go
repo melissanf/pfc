@@ -28,7 +28,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
     }
     // Vérifier si le prof a déjà 3 choix enregistrés
     var count int
-    err = db.QueryRow("SELECT COUNT(*) FROM fiches WHERE prof_id = ?", profID).Scan(&count)
+    err = db.QueryRow("SELECT COUNT(*) FROM fiche WHERE prof_id = ?", profID).Scan(&count)
     if err != nil {
         http.Error(res, "Erreur lors de la vérification", http.StatusInternalServerError)
         return
@@ -45,7 +45,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
         {Fillier: req.FormValue("fillier3"), Anner: req.FormValue("anner3"), Tp: formBool(req, "tp3"), Td: formBool(req, "td3"), Cour: formBool(req, "cour3"), Priority: 3},
     }
 
-    stmt, err := db.Prepare("INSERT INTO fiches (prof_id, fillier, anner, tp, td, cour, priority) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    stmt, err := db.Prepare("INSERT INTO fiche (prof_id, fillier, anner, tp, td, cour, priority) VALUES (?, ?, ?, ?, ?, ?, ?)")
     if err != nil {
         http.Error(res, "Erreur de préparation de la requête", http.StatusInternalServerError)
         return
