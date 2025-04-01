@@ -1,6 +1,7 @@
 package handlers
 import(
    "net/http"
+   "Devenir_dev/cmd/database"
 )
 
 
@@ -14,7 +15,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
         http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
         return
     }
-	
+	db := database.GetDB()
 	err := req.ParseForm()
     if err != nil {
         http.Error(res, "Error parsing form data", http.StatusBadRequest)

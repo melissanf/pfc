@@ -1,9 +1,7 @@
 package handlers
 import ( 
 	"net/http"
-
-
-	
+    "Devenir_dev/cmd/database"
 
 )
 func DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
@@ -11,7 +9,7 @@ func DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
         http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
         return
     }
-
+    db := database.GetDB()
     // Récupérer le nom de l'utilisateur à supprimer à partir des paramètres de la requête
     username := req.FormValue("username")
     if username == "" {

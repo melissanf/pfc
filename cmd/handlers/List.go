@@ -1,9 +1,11 @@
 package handlers
 import (
 	"net/http"
+    "Devenir_dev/cmd/database"
 )
 func List(res http.ResponseWriter, req *http.Request){
 	session, _ := store.Get(req, "session-name")
+    db := database.GetDB()
 	users, err := GetAllUsers(db)
     if err != nil {
         http.Error(res, "Error fetching users", http.StatusInternalServerError)

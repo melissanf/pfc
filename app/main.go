@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"Devenir_dev/cmd/handlers"
+	"Devenir_dev/cmd/database"
 	"log"
 	"github.com/gorilla/mux"
 )
 
 const port = ":3000"
 func main (){
-	handlers.InitDB()
+	database.InitDB()
 	app := mux.NewRouter()
 	app.HandleFunc("/login", handlers.Login)
 	app.HandleFunc("/Submit", handlers.Submit)

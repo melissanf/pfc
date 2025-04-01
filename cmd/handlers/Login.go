@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
     "strings"
+    "Devenir_dev/cmd/database"
     "github.com/gorilla/sessions"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -15,6 +16,7 @@ func Login(res http.ResponseWriter, req *http.Request) {
         Rendertemplates(res, "Login",nil)
         return
     }
+    db := database.GetDB()
 
     if req.Method == http.MethodPost {
         // Parse the form data

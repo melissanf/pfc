@@ -3,11 +3,9 @@ import(
 	
 	"fmt"
 	"net/http"
-	 "database/sql"
+	 "Devenir_dev/cmd/database"
 	 _ "github.com/go-sql-driver/mysql"
 )
-var db *sql.DB
-
 
 
 func Submit(res http.ResponseWriter, req *http.Request) {
@@ -20,7 +18,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
         http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
         return
     }
-
+    db := database.GetDB()
 	err := req.ParseForm()
     if err != nil {
         http.Error(res, "Error parsing form data", http.StatusBadRequest)
