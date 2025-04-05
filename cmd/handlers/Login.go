@@ -1,15 +1,18 @@
 package handlers
 
 import (
+	"Devenir_dev/cmd/database"
 	"fmt"
 	"net/http"
-    "strings"
-    "Devenir_dev/cmd/database"
-    "github.com/gorilla/sessions"
-	_ "github.com/go-sql-driver/mysql"
-)
+	"strings"
+	"time"
 
-var store = sessions.NewCookieStore([]byte("secret-key")) // Clé secrète pour sécurise
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/sessions"
+)
+const SecretKey="iliii"
+var store = sessions.NewCookieStore([]byte(SecretKey)) // Clé secrète pour sécurise
 
 func Login(res http.ResponseWriter, req *http.Request) {
     if req.Method == http.MethodGet {
@@ -39,7 +42,7 @@ func Login(res http.ResponseWriter, req *http.Request) {
         }
         var query string
         var name string
-       if verified {
+        if verified {
         session, _ := store.Get(req, "session-name")
         if strings.Contains(identifier, "@") {
             query = "SELECT name FROM users WHERE email = ?"
@@ -51,6 +54,14 @@ func Login(res http.ResponseWriter, req *http.Request) {
     
         session.Values["isAdmin"] = isAdmin
         session.Save(req, res) 
+       }
+       claims:=jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+        ExpirAt:= time.Now().Add(time.Hour*24).Unix()
+
+       })
+       token,err = claims.SignedString([]byte(SecretKey))
+       if err != nil {
+
        }
         // Redirect based on admin status
             http.Redirect(res, req, "/Home", http.StatusFound)

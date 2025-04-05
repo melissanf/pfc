@@ -1,10 +1,12 @@
 package handlers
-import(
-	
+
+import (
+	"Devenir_dev/cmd/database"
 	"fmt"
 	"net/http"
-	 "Devenir_dev/cmd/database"
-	 _ "github.com/go-sql-driver/mysql"
+
+	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -38,6 +40,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
     // Validate and sanitize input
     ValidateInput(user)
     SanitizeInput(&user)
+    password,_:=bcrypt.GenerateFromPassword([]byte(user.Mdp),14)
 
     // Prepare SQL statement
     stmt, err := db.Prepare("INSERT INTO users(name, email, password, isAdmin ,Speciality ,Year_entrance,Grade) VALUES(?, ?, ?, ?, ?, ?, ?)")
@@ -48,7 +51,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
     }
     defer stmt.Close()
 
-    _, err = stmt.Exec(user.Name, user.Email, user.Mdp ,user.Isadmin,user.Speciality,user.Year_entrance)
+    _, err = stmt.Exec(user.Name, user.Email, password ,user.Isadmin,user.Speciality,user.Year_entrance)
     if err != nil {
         fmt.Println("Database exec error:", err)  
         http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)

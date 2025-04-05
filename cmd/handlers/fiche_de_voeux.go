@@ -41,12 +41,12 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
 
     // Récupérer les 3 choix depuis le formulaire
     choices := []Fiche{
-        {Fillier: req.FormValue("fillier1"), Anner: req.FormValue("anner1"), Tp: formBool(req, "tp1"), Td: formBool(req, "td1"), Cour: formBool(req, "cour1"), Priority: 1},
-        {Fillier: req.FormValue("fillier2"), Anner: req.FormValue("anner2"), Tp: formBool(req, "tp2"), Td: formBool(req, "td2"), Cour: formBool(req, "cour2"), Priority: 2},
-        {Fillier: req.FormValue("fillier3"), Anner: req.FormValue("anner3"), Tp: formBool(req, "tp3"), Td: formBool(req, "td3"), Cour: formBool(req, "cour3"), Priority: 3},
+        {Spe: req.FormValue("Spe1"), Palier: req.FormValue("Palier1"), Tp: formBool(req, "tp1"), Td: formBool(req, "td1"), Cour: formBool(req, "cour1"), Priority: 1},
+        {Spe: req.FormValue("Spe2"), Palier: req.FormValue("Palier2"), Tp: formBool(req, "tp2"), Td: formBool(req, "td2"), Cour: formBool(req, "cour2"), Priority: 2},
+        {Spe: req.FormValue("Spe3"), Palier: req.FormValue("Palier3"), Tp: formBool(req, "tp3"), Td: formBool(req, "td3"), Cour: formBool(req, "cour3"), Priority: 3},
     }
 
-    stmt, err := db.Prepare("INSERT INTO fiche (prof_id, fillier, anner, tp, td, cour, priority) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    stmt, err := db.Prepare("INSERT INTO fiche (prof_id, spe, palier, tp, td, cour, priority) VALUES (?, ?, ?, ?, ?, ?, ?)")
     if err != nil {
         http.Error(res, "Erreur de préparation de la requête", http.StatusInternalServerError)
         return
@@ -54,8 +54,8 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
     defer stmt.Close()
 
     for _, choice := range choices {
-        if choice.Fillier != "" { // Vérifier si le choix est rempli
-            _, err = stmt.Exec(profID, choice.Fillier, choice.Anner, choice.Tp, choice.Td, choice.Cour, choice.Priority)
+        if choice.Spe != "" { // Vérifier si le choix est rempli
+            _, err = stmt.Exec(profID, choice.Spe, choice.Palier, choice.Tp, choice.Td, choice.Cour, choice.Priority)
             if err != nil {
                 http.Error(res, "Erreur lors de l'insertion", http.StatusInternalServerError)
                 return

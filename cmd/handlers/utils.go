@@ -1,14 +1,16 @@
 package handlers
+
 import (
 	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
 	"regexp"
-    
+	"strings"
+
 	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -23,8 +25,9 @@ type User struct {
     Isadmin bool `json:"Isadmin"`
 }
 type Fiche struct{
-	Fillier string `json:"fillier"`
-	Anner string `json:"anner"`
+	Spe string `json:"spe"`
+	Palier string `json:"palier"`
+	Module string `json:"module"`
 	Tp bool `json:"tp"`
 	Td bool `json:"td"`
 	Cour bool `json:"cour"`
@@ -80,7 +83,7 @@ func Rendertemplates(res http.ResponseWriter,tmpl string ,data interface{}){
      }
    }
 func VerifyUser(db *sql.DB, identifier, password string) (bool, bool, string) {
-	var storedPassword string
+	var storedPassword []byte
 	var isAdmin bool
 	var query string
 	
@@ -104,7 +107,8 @@ func VerifyUser(db *sql.DB, identifier, password string) (bool, bool, string) {
 		}
 	
 		// Compare provided password with stored password (ensure passwords are hashed)
-	if password == storedPassword {
+	
+	if err =bcrypt.CompareHashAndPassword(storedPassword,[]byte(password));err !=nil{
 		return true, isAdmin, "User verified."
 	} else {
 		return false, false, "Incorrect password."
