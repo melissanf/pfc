@@ -1,6 +1,9 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+	"Devenir_dev/pkg/utils"
+)
 func HandelProfile(res http.ResponseWriter,req *http.Request){
 	session, _ := store.Get(req, "session-name")
 	username, ok := session.Values["username"].(string)
@@ -9,9 +12,9 @@ func HandelProfile(res http.ResponseWriter,req *http.Request){
         http.Redirect(res, req, "/login", http.StatusFound) // Rediriger si l'utilisateur n'est pas connecté
         return
     }
-	Data := User{
+	Data := utils.User{
 		Name: username,
 	    Email: email,
   }
-  Rendertemplates(res,"Profil",Data)
+  utils.Rendertemplates(res,"Profil",Data)
 }

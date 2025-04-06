@@ -2,12 +2,13 @@ package handlers
 import(
    "net/http"
    "Devenir_dev/cmd/database"
+   "Devenir_dev/pkg/utils"
 )
 
 
 func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
 	if req.Method == http.MethodGet {
-        Rendertemplates(res, "Fiche",nil)
+        utils.Rendertemplates(res, "Fiche",nil)
         return
     }
 
@@ -40,7 +41,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
     }
 
     // Récupérer les 3 choix depuis le formulaire
-    choices := []Fiche{
+    choices := []utils.Fiche{
         {Spe: req.FormValue("Spe1"), Palier: req.FormValue("Palier1"), Tp: formBool(req, "tp1"), Td: formBool(req, "td1"), Cour: formBool(req, "cour1"), Priority: 1},
         {Spe: req.FormValue("Spe2"), Palier: req.FormValue("Palier2"), Tp: formBool(req, "tp2"), Td: formBool(req, "td2"), Cour: formBool(req, "cour2"), Priority: 2},
         {Spe: req.FormValue("Spe3"), Palier: req.FormValue("Palier3"), Tp: formBool(req, "tp3"), Td: formBool(req, "td3"), Cour: formBool(req, "cour3"), Priority: 3},

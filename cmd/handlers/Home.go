@@ -1,6 +1,6 @@
 package handlers
 import( 
-
+    "Devenir_dev/pkg/utils"
 	"net/http"
  
 )
@@ -9,6 +9,6 @@ import(
 func Home(res http.ResponseWriter, req *http.Request){
 
 
-	Rendertemplates(res,"Home", nil)
+	utils.Rendertemplates(res,"Home", nil)
 		
 }

@@ -2,6 +2,7 @@ package handlers
 import ( 
 	"net/http"
     "Devenir_dev/cmd/database"
+    "Devenir_dev/pkg/utils"
 
 )
 func DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
@@ -18,7 +19,7 @@ func DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
     }
 
     // Supprimer l'utilisateur
-    err := DeleteUser(db, username)
+    err := utils.DeleteUser(db, username)
     if err != nil {
         http.Error(res, "Error deleting user", http.StatusInternalServerError)
         return

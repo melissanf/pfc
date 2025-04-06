@@ -4,7 +4,7 @@ import (
 	"Devenir_dev/cmd/database"
 	"fmt"
 	"net/http"
-
+    "Devenir_dev/pkg/utils"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,7 +13,7 @@ import (
 func Submit(res http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodGet {
         // Render the login page (e.g., HTML page)
-        Rendertemplates(res, "Submit",nil)
+        utils.Rendertemplates(res, "Submit",nil)
         return
     }
     if req.Method != http.MethodPost {
@@ -27,7 +27,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
         return
     }
     // Create a User struct from form data
-    user := User{
+    user := utils.User{
         Name:     req.FormValue("username"),
         Email:    req.FormValue("email"),
         Mdp:      req.FormValue("password"),
@@ -38,8 +38,8 @@ func Submit(res http.ResponseWriter, req *http.Request) {
     }
 
     // Validate and sanitize input
-    ValidateInput(user)
-    SanitizeInput(&user)
+    utils.ValidateInput(user)
+    utils.SanitizeInput(&user)
     password,_:=bcrypt.GenerateFromPassword([]byte(user.Mdp),14)
 
     // Prepare SQL statement
