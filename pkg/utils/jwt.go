@@ -1,75 +1,51 @@
 package utils
-
 import (
-	"errors"
-	"log"
-	"time"
-
-	"github.com/golang-jwt/jwt/v5"
+	"encoding/json"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/mitchellh/mapstructure"
+	"net/http"
 )
+type JwtToken struct {
+	Token string `json:"token"`
+}
+type Exception struct {
+	Message string `json:"message"`
+}
 
-var jwtSecret = "this is the secrey key"
 
-func GenerateToken(user models.User) (string, error) {
+
+func CreateTokenEndpoint(w http.ResponseWriter, r *http.Request) {
+	var user User
+	_ = json.NewDecoder(r.Body).Decode(&user)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"Email": user.Email,
-		"Id":    user.ID,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"username": user.Name,
 	})
-	tokenString, err := token.SignedString([]byte(jwtSecret))
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil
-}
+	tokenString, err := token.SignedString([]byte("secret"))
 
-func ParseToken(tokenString string) *jwt.Token {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(jwtSecret), nil
-	})
 	if err != nil {
-		log.Println(err)
-		return nil
+		fmt.Println(err)
 	}
 
-	return token
+	json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 }
 
-func RefreshToken(refreshToken string) (string, error) {
-	// Parse and validate the refresh token
-	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-		// Check token signing method
+func ProtectedEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
+
+	token, _ := jwt.Parse(params["token"][0], func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("Invalid token signing method")
+			return nil, fmt.Errorf("There was an error")
 		}
-		return jwtSecret, nil
-	})
-	if err != nil {
-		return "", err
-	}
-
-	// Check if token is valid and not expired
-	if !token.Valid {
-		return "", errors.New("Invalid token")
-	}
-
-	// Extract user information from the token, such as user ID or username
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return "", errors.New("Invalid token claims")
-	}
-
-	// Generate a new JWT token
-	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": claims["user_id"],                       // Assuming user ID is stored in the refresh token claims
-		"exp":     time.Now().Add(time.Minute * 15).Unix(), // Token expiration time
+		return []byte("secret"), nil
 	})
 
-	// Sign the token with the secret key
-	tokenString, err := newToken.SignedString(jwtSecret)
-	if err != nil {
-		return "", err
-	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		var user User
 
-	return tokenString, nil
+		mapstructure.Decode(claims, &user)
+		json.NewEncoder(w).Encode(user)
+	} else {
+		json.NewEncoder(w).Encode(Exception{Message: "Invalid authorization token"})
+	}
 }

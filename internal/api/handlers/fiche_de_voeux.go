@@ -13,7 +13,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request){
     }
 
 	if req.Method != http.MethodPost {
-        http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
+        http.Error(res, "Invalid request method", http.StatusMethodNotAllowed) 
         return
     }
 	db := database.GetDB()

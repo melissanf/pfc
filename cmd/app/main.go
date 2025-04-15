@@ -13,6 +13,7 @@ const port = ":3000"
 func main (){
 	database.InitDB()
 	app := mux.NewRouter()
+	app.Use(middelware)
 	app.HandleFunc("/login", handlers.Login)
 	app.HandleFunc("/Submit", handlers.Submit)
 	app.HandleFunc("/Home", handlers.Home)
