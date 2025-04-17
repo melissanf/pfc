@@ -1,8 +1,9 @@
 package handlers
 import(
    "net/http"
-   "Devenir_dev/cmd/database"
-   "Devenir_dev/pkg/utils"
+   "Devenir_dev/internal/database"
+   "Devenir_dev/internal/api/models"
+   "Devenir_dev/pkg"
 )
 
 

@@ -1,6 +1,7 @@
 package handlers
 import( 
-    "Devenir_dev/pkg/utils"
+    "Devenir_dev/pkg"
+	"Devenir_dev/internal/api/models"
 	"net/http"
  
 )

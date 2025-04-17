@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"Devenir_dev/cmd/database"
+	"Devenir_dev/internal/database"
+    "Devenir_dev/internal/api/models"
 	"fmt"
 	"net/http"
-    "Devenir_dev/pkg/utils"
+    "Devenir_dev/pkg"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )

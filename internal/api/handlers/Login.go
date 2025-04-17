@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"Devenir_dev/cmd/database"
+	"Devenir_dev/internal/database"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+    "Devenir_dev/internal/api/models"
 	"time"
-    "Devenir_dev/pkg/utils"
+    "Devenir_dev/pkg"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/sessions"
@@ -57,7 +58,7 @@ func Login(res http.ResponseWriter, req *http.Request) {
         session.Save(req, res) 
        }
        claims:=jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-        Issuer : strconv.Itoa(int(user.id)),
+        Issuer : strconv.Itoa(int(user.ID)),
         ExpirAt: time.Now().Add(time.Hour*24).Unix(),
 })
        token,err:= claims.SignedString([]byte(SecretKey))

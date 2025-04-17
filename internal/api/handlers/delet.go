@@ -1,8 +1,8 @@
 package handlers
 import ( 
 	"net/http"
-    "Devenir_dev/cmd/database"
-    "Devenir_dev/pkg/utils"
+    "Devenir_dev/internal/database"
+    "Devenir_dev/pkg"
 
 )
 func DeleteUserHandler(res http.ResponseWriter, req *http.Request) {

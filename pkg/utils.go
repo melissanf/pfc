@@ -24,15 +24,6 @@ type User struct {
 	Speciality string `json:"speciality"`
     Isadmin bool `json:"Isadmin"`
 }
-type Fiche struct{
-	Spe string `json:"spe"`
-	Palier string `json:"palier"`
-	Module string `json:"module"`
-	Tp bool `json:"tp"`
-	Td bool `json:"td"`
-	Cour bool `json:"cour"`
-	Priority int `json:"priority"`
-}
 type Pagedata struct {
 	Currentuser User
 	Users []User 

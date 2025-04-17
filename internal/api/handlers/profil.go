@@ -2,7 +2,8 @@ package handlers
 
 import (
 	"net/http"
-	"Devenir_dev/pkg/utils"
+	"Devenir_dev/pkg"
+	"Devenir_dev/internal/api/models"
 )
 func HandelProfile(res http.ResponseWriter,req *http.Request){
 	session, _ := store.Get(req, "session-name")
@@ -12,8 +13,8 @@ func HandelProfile(res http.ResponseWriter,req *http.Request){
         http.Redirect(res, req, "/login", http.StatusFound) // Rediriger si l'utilisateur n'est pas connecté
         return
     }
-	Data := utils.User{
-		Name: username,
+	Data := models.User{
+		Username: username,
 	    Email: email,
   }
   utils.Rendertemplates(res,"Profil",Data)
