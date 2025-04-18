@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"Devenir_dev/internal/api/models"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -14,53 +15,11 @@ import (
 )
 
 
-type User struct {
-	Id int `json:"Id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Mdp string `json:"mdp"`
-	Grade string `json:"grade"`
-	Year_entrance string `json:"year_entrance"`
-	Speciality string `json:"speciality"`
-    Isadmin bool `json:"Isadmin"`
-}
 type Pagedata struct {
-	Currentuser User
-	Users []User 
+	Currentuser models.User
+	Users []models.User 
 }
-func GetAllUsers(db *sql.DB) ([]User, error) {
-    query := "SELECT  name, email, speciality, grade,  year_entrance,  isAdmin FROM users"
-    rows, err := db.Query(query)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
 
-    var users []User
-    for rows.Next() {
-        var user User
-        err := rows.Scan(&user.Name, &user.Email, &user.Speciality, &user.Grade, &user.Year_entrance, &user.Isadmin)
-        if err != nil {
-            return nil, err
-        }
-        users = append(users, user)
-    }
-
-    // Check for any error that may have occurred during iteration
-    if err := rows.Err(); err != nil {
-        return nil, err
-    }
-
-    return users, nil
-}
-func DeleteUser(db *sql.DB, username string) error {
-    query := "DELETE FROM users WHERE name = ?"
-    _, err := db.Exec(query, username)
-    if err != nil {
-        return err
-    }
-    return nil
-}
 func Rendertemplates(res http.ResponseWriter,tmpl string ,data interface{}){
 	t, err:= template.ParseFiles("C:\\Users\\PC\\OneDrive\\Documents\\futur\\Devenir_dev\\templates\\"+tmpl+".page.tmpl")
 	if err !=nil  {
@@ -106,9 +65,9 @@ func VerifyUser(db *sql.DB, identifier, password string) (bool, bool, string) {
 	}
 }
 
-func ValidateInput(user User) (bool, string) {
+func ValidateInput(user models.User) (bool, string) {
 	// Vérification des champs vides
-	if user.Name == "" || user.Email == "" || user.Mdp == "" || user.Year_entrance == "" || user.Grade == "" || user.Speciality == ""  {
+	if user.Username == "" || user.Email == "" || user.PasswordHash == "" || user.Role == "" || user.FullName == "" {
 		return false, "All fields (name, email, password,Speciality ,Year_entrance, Grade) are required."
 	}
 
@@ -119,30 +78,25 @@ func ValidateInput(user User) (bool, string) {
 	}
 
 	// Vérification de la longueur du mot de passe (ex: minimum 6 caractères)
-	if len(user.Mdp) < 6 {
+	if len(user.PasswordHash) < 6 {
 		return false, "Password must be at least 6 characters long."
 	}
     
 	return true, ""
 }
-func SanitizeInput(user *User) {
-	// Supprime les espaces avant et après les champs
-	user.Name = strings.TrimSpace(user.Name)
-	user.Email = strings.TrimSpace(user.Email)
-	user.Mdp = strings.TrimSpace(user.Mdp)
-	user.Year_entrance = strings.TrimSpace(user.Year_entrance)
-	user.Speciality = strings.TrimSpace(user.Speciality)
-	user.Grade = strings.TrimSpace(user.Grade)
-
-
-	// Supprime les tags HTML potentiellement dangereux (protection contre XSS)
+func SanitizeInput(user *models.User) {
 	re := regexp.MustCompile("<.*?>")
-	user.Name = re.ReplaceAllString(user.Name, "")
-	user.Email = re.ReplaceAllString(user.Email, "")
-	user.Mdp = re.ReplaceAllString(user.Mdp, "")
-	user.Year_entrance = re.ReplaceAllString(user.Year_entrance,"")
-	user.Speciality = re.ReplaceAllString(user.Speciality,"")
-	user.Grade = re.ReplaceAllString(user.Grade,"")
+
+	user.Username = clean(user.Username, re)
+	user.Email = clean(user.Email, re)
+	user.PasswordHash = clean(user.PasswordHash, re)
+	user.Role = clean(user.Role, re)
+	user.FullName = clean(user.FullName, re)
+}
+
+// clean supprime les balises HTML et les espaces inutiles
+func clean(s string, re *regexp.Regexp) string {
+	return re.ReplaceAllString(strings.TrimSpace(s), "")
 }
 func formBool(r *http.Request, key string) bool {
     return r.FormValue(key) == "on"

@@ -9,7 +9,6 @@ type User struct {
 	Email       string `json:"email"`
 	PasswordHash string `json:"password_hash"`
 	Role         string `json:"role"`
-	TeacherID    int    `json:"teacher_id"`
 	FullName     string `json:"full_name"`
 }
 

@@ -28,20 +28,18 @@ func Submit(res http.ResponseWriter, req *http.Request) {
         return
     }
     // Create a User struct from form data
-    user := utils.User{
-        Name:     req.FormValue("username"),
+    user := models.User{
+        Username:     req.FormValue("username"),
         Email:    req.FormValue("email"),
-        Mdp:      req.FormValue("password"),
-        Grade:    req.FormValue("Grade"),
-        Year_entrance: req.FormValue("Year_entrance"),
-        Speciality: req.FormValue("Speciality"),
-        Isadmin:  req.FormValue("isAdmin")=="true",
+        PasswordHash:      req.FormValue("password"),
+        Role:    req.FormValue("role"),
+        FullName: req.FormValue("name"),
     }
 
     // Validate and sanitize input
     utils.ValidateInput(user)
     utils.SanitizeInput(&user)
-    password,_:=bcrypt.GenerateFromPassword([]byte(user.Mdp),14)
+    password,_:=bcrypt.GenerateFromPassword([]byte(user.PasswordHash),14)
 
     // Prepare SQL statement
     stmt, err := db.Prepare("INSERT INTO users(name, email, password, isAdmin ,Speciality ,Year_entrance,Grade) VALUES(?, ?, ?, ?, ?, ?, ?)")
@@ -52,7 +50,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
     }
     defer stmt.Close()
 
-    _, err = stmt.Exec(user.Name, user.Email, password ,user.Isadmin,user.Speciality,user.Year_entrance)
+    _, err = stmt.Exec(user.Username, user.Email, password ,user.Role,user.FullName)
     if err != nil {
         fmt.Println("Database exec error:", err)  
         http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)

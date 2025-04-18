@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mitchellh/mapstructure"
+	"Devenir_dev/internal/api/models"
 	"net/http"
 )
 type JwtToken struct {
@@ -16,10 +17,10 @@ type Exception struct {
 
 
 func CreateTokenEndpoint(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user models.User
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Name,
+		"username": user.Username,
 	})
 	tokenString, err := token.SignedString([]byte("secret"))
 
@@ -41,7 +42,7 @@ func ProtectedEndpoint(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		var user User
+		var user models.User
 
 		mapstructure.Decode(claims, &user)
 		json.NewEncoder(w).Encode(user)
