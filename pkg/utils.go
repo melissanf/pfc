@@ -2,73 +2,73 @@ package utils
 
 import (
 	"Devenir_dev/internal/api/models"
-	"database/sql"
-	"fmt"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"html/template"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
-	"golang.org/x/crypto/bcrypt"
+	"fmt"
 )
-
 
 type Pagedata struct {
 	Currentuser models.User
-	Users []models.User 
+	Users       []models.User
 }
 
-func Rendertemplates(res http.ResponseWriter,tmpl string ,data interface{}){
-	t, err:= template.ParseFiles("C:\\Users\\PC\\OneDrive\\Documents\\futur\\Devenir_dev\\templates\\"+tmpl+".page.tmpl")
-	if err !=nil  {
-	   http.Error(res,err.Error(),http.StatusInternalServerError)
-	   return
-	}
-	err =t.Execute(res , data)
+// Rendertemplates charge et affiche les templates
+func Rendertemplates(res http.ResponseWriter, tmpl string, data interface{}) {
+	t, err := template.ParseFiles("C:\\Users\\PC\\OneDrive\\Documents\\futur\\Devenir_dev\\templates\\" + tmpl + ".page.tmpl")
 	if err != nil {
-	   http.Error(res, "Error executing template", http.StatusInternalServerError)
-	   fmt.Println("Error executing template:", err)
-     }
-   }
-func VerifyUser(db *sql.DB, identifier, password string) (bool, bool, string) {
-	var storedPassword []byte
-	var isAdmin bool
-	var query string
-	
-	// Check if identifier is an email or username
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = t.Execute(res, data)
+	if err != nil {
+		http.Error(res, "Error executing template", http.StatusInternalServerError)
+		fmt.Println("Error executing template:", err)
+	}
+}
+
+// VerifyUser vérifie l'authentification de l'utilisateur avec GORM
+func VerifyUser(db *gorm.DB, identifier, password string) (bool, models.Role, string) {
+	var user models.User
+
+	// Vérifie si l'identifiant est un email ou un nom d'utilisateur
 	if strings.Contains(identifier, "@") {
-	    query = "SELECT password, isAdmin FROM users WHERE email = ?"
-	        } else {
-			    query = "SELECT password, isAdmin FROM users WHERE name = ?"
-		    }
-	
-		// Execute the query
-	err := db.QueryRow(query, identifier).Scan(&storedPassword, &isAdmin)
-	
-		// Handle case where the user is not found or other SQL errors occur
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return false, false, "User not found."
+		// Si c'est un email
+		if err := db.Where("email = ?", identifier).First(&user).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return false, "", "User not found."
+			}
+			log.Println("GORM Error:", err)
+			return false, "", "Database error."
 		}
-		    log.Println("SQL Error:", err)
-			return false, false, "Database error."
-		}
-	
-		// Compare provided password with stored password (ensure passwords are hashed)
-	
-	if err =bcrypt.CompareHashAndPassword(storedPassword,[]byte(password));err !=nil{
-		return true, isAdmin, "User verified."
 	} else {
-		return false, false, "Incorrect password."
+		// Si c'est un nom d'utilisateur
+		if err := db.Where("nom = ?", identifier).First(&user).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return false, "", "User not found."
+			}
+			log.Println("GORM Error:", err)
+			return false, "", "Database error."
+		}
 	}
+
+	// Vérifie le mot de passe
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		return false, "", "Incorrect password."
+	}
+
+	return true, user.Role, "User verified."
 }
 
+// ValidateInput vérifie la validité des champs utilisateur
 func ValidateInput(user models.User) (bool, string) {
 	// Vérification des champs vides
-	if user.Username == "" || user.Email == "" || user.PasswordHash == "" || user.Role == "" || user.FullName == "" {
-		return false, "All fields (name, email, password,Speciality ,Year_entrance, Grade) are required."
+	if user.Nom == "" || user.Prenom == "" || user.Password == "" || user.Role == "" || user.Email == "" {
+		return false, "All fields (nom, prenom, email, password, role) are required."
 	}
 
 	// Vérification de l'email avec une expression régulière
@@ -78,26 +78,38 @@ func ValidateInput(user models.User) (bool, string) {
 	}
 
 	// Vérification de la longueur du mot de passe (ex: minimum 6 caractères)
-	if len(user.PasswordHash) < 6 {
+	if len(user.Password) < 6 {
 		return false, "Password must be at least 6 characters long."
 	}
-    
+
 	return true, ""
 }
+func sanitizeRole(role models.Role) models.Role {
+	switch role {
+	case models.Admin,models.Professeur, models.Responsable:
+		return models.Role(role) // Rôle valide
+	default:
+		// Retourne un rôle par défaut si le rôle est invalide
+		return models.Professeur
+	}
+}
+
 func SanitizeInput(user *models.User) {
 	re := regexp.MustCompile("<.*?>")
 
-	user.Username = clean(user.Username, re)
+	user.Nom = clean(user.Nom, re)
+	user.Prenom = clean(user.Prenom, re)
+	user.Password = clean(user.Password, re)
 	user.Email = clean(user.Email, re)
-	user.PasswordHash = clean(user.PasswordHash, re)
-	user.Role = clean(user.Role, re)
-	user.FullName = clean(user.FullName, re)
+	user.Role = sanitizeRole(user.Role)
 }
 
 // clean supprime les balises HTML et les espaces inutiles
 func clean(s string, re *regexp.Regexp) string {
 	return re.ReplaceAllString(strings.TrimSpace(s), "")
 }
-func formBool(r *http.Request, key string) bool {
-    return r.FormValue(key) == "on"
+
+// FormBool vérifie si une case à cocher est activée dans un formulaire
+func FormBool(r *http.Request, key string) bool {
+	return r.FormValue(key) == "on"
 }

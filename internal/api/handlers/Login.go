@@ -2,16 +2,17 @@ package handlers
 
 import (
 	"Devenir_dev/internal/database"
+	"Devenir_dev/internal/api/services"
 	"Devenir_dev/pkg"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v5"	
+	"os"
 )
-const SecretKey = "ilyes"
-var jwtSecretKey = []byte(SecretKey)
+
+var jwtSecretKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
@@ -23,8 +24,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		return
 	}
-
-	// Parse form
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Erreur dans le formulaire", http.StatusBadRequest)
 		return
@@ -41,22 +40,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Récupération du nom si email
 	var name string
-	if strings.Contains(identifier, "@") {
-		query := "SELECT name FROM users WHERE email = ?"
-		if err := db.QueryRow(query, identifier).Scan(&name); err != nil {
-			http.Error(w, "Erreur lors de la récupération du nom", http.StatusInternalServerError)
-			return
-		}
-	} else {
-		name = identifier
+	user, err := services.GetUserByEmail(db, identifier)
+	if err != nil {
+		http.Error(w, "Erreur lors de la récupération de l'utilisateur", http.StatusInternalServerError)
+		return
 	}
+	name = user.Nom + " " + user.Prenom
 
 	// Création du token JWT
 	claims := jwt.MapClaims{
 		"username": name,
-		"isAdmin":  isAdmin,
+		"role":     isAdmin,
 		"exp":      time.Now().Add(24 * time.Hour).Unix(),
 	}
 
@@ -67,14 +62,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Envoi du token (au choix : en JSON ou en cookie)
-	// OPTION 1 : Réponse JSON
+	// Réponse JSON avec le token
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"token": tokenString,
 	})
 
-	// OPTION 2 (alternative) : stocker en cookie HTTP-only sécurisé
+	// Optionnel : Stocker le token dans un cookie HTTP-only sécurisé
 	/*
 		http.SetCookie(w, &http.Cookie{
 			Name:     "auth-token",
@@ -85,5 +79,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		})
 	*/
 
+	// Log de l'opération
 	fmt.Printf("Token JWT généré pour %s\n", name)
 }
