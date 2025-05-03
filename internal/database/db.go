@@ -13,6 +13,7 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("Database connection error:", err)
 	}
+	return  &db
 }
 
 func GetDB() *sql.DB {

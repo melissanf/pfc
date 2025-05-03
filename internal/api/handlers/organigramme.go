@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"Devenir_dev/internal/api/models"
-	utils "Devenir_dev/pkg"
+	"Devenir_dev/pkg"
 	"encoding/json"
 	"net/http"
 )
