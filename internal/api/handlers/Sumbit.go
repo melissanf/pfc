@@ -1,64 +1,73 @@
 package handlers
 
 import (
+	"Devenir_dev/internal/api/models"
+	"Devenir_dev/internal/api/services"
 	"Devenir_dev/internal/database"
-    "Devenir_dev/internal/api/models"
-	"fmt"
+	"Devenir_dev/pkg"
 	"net/http"
-    "Devenir_dev/pkg"
+	"time"
+
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
-
-
 func Submit(res http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodGet {
-        // Render the login page (e.g., HTML page)
-        utils.Rendertemplates(res, "Submit",nil)
-        return
-    }
-    if req.Method != http.MethodPost {
-        http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
-        return
-    }
-    db := database.GetDB()
+		utils.Rendertemplates(res, "Submit", nil)
+		return
+	}
+
+	if req.Method != http.MethodPost {
+		http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	db := database.GetDB()
+
 	err := req.ParseForm()
-    if err != nil {
-        http.Error(res, "Error parsing form data", http.StatusBadRequest)
-        return
-    }
-    // Create a User struct from form data
-    user := models.User{
-        Username:     req.FormValue("username"),
-        Email:    req.FormValue("email"),
-        PasswordHash:      req.FormValue("password"),
-        Role:    req.FormValue("role"),
-        FullName: req.FormValue("name"),
-    }
+	if err != nil {
+		http.Error(res, "Error parsing form data", http.StatusBadRequest)
+		return
+	}
 
-    // Validate and sanitize input
-    utils.ValidateInput(user)
-    utils.SanitizeInput(&user)
-    password,_:=bcrypt.GenerateFromPassword([]byte(user.PasswordHash),14)
+	user := models.User{
+		Nom:      req.FormValue("nom"),
+		Prenom:   req.FormValue("prenom"),
+		Email:    req.FormValue("email"),
+		Password: req.FormValue("password"),
+		Role:     models.Role(req.FormValue("role")), // Assure-toi que la valeur correspond bien à un rôle valide
+	}
 
-    // Prepare SQL statement
-    stmt, err := db.Prepare("INSERT INTO users(name, email, password, isAdmin ,Speciality ,Year_entrance,Grade) VALUES(?, ?, ?, ?, ?, ?, ?)")
-    if err != nil {
-        fmt.Println("Database prepare error:", err)  // Log the actual error
-        http.Error(res, "Database error", http.StatusInternalServerError)
-        return
-    }
-    defer stmt.Close()
+	utils.ValidateInput(user)
+	utils.SanitizeInput(&user)
 
-    _, err = stmt.Exec(user.Username, user.Email, password ,user.Role,user.FullName)
-    if err != nil {
-        fmt.Println("Database exec error:", err)  
-        http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
-        return
-    }
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	user.Password = string(hashedPassword)
 
-    // Send success response
-        http.Redirect(res, req, "/Home", http.StatusFound)
-    
-    
+	if err := services.CreateUser(db, &user); err != nil {
+		http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
+		return
+	}
+
+
+	claims := models.Claims{
+		UserID:   user.ID,
+		Username: user.Nom + " " + user.Prenom,
+		Role:     user.Role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		},
+	}
+	
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtSecretKey)
+	if err != nil {
+		http.Error(res, "Erreur lors de la génération du token", http.StatusInternalServerError)
+		return
+	}
+	res.Header().Set("Authorization", "Bearer "+tokenString)
+
+	// Redirection ou réponse JSON selon le cas
+	http.Redirect(res, req, "/Home", http.StatusFound)
 }
