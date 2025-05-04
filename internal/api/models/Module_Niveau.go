@@ -4,9 +4,9 @@ type ModuleNiveau struct {
     ID          uint   `gorm:"primaryKey"`
     ModuleID    uint
     NiveauID    uint
-    ChargeCours uint 
-    ChargeTD    uint 
-    ChargeTP    uint 
+    ChargeCours int 
+    ChargeTD    int 
+    ChargeTP    int 
 
     Module      Module `gorm:"foreignKey:ModuleID"`
     Niveau      Niveau `gorm:"foreignKey:NiveauID"`

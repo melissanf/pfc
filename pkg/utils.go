@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-
+	"time"
+	"os"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -35,14 +36,14 @@ func VerifyUser(db *gorm.DB, identifier, password string) (bool, models.User, st
 	var user models.User
 	if err := db.Where("email = ?", identifier).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return false, null, "User not found."
+			return false, user, "User not found."
 		}
 		log.Println("GORM Error:", err)
-		return false, null, "Database error."
+		return false, user, "Database error."
 	}
 	// Vérifie le mot de passe
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return false, null, "Incorrect password."
+		return false, user, "Incorrect password."
 	}
 
 	return true, user, "User verified."
@@ -93,9 +94,8 @@ func clean(s string, re *regexp.Regexp) string {
 	return re.ReplaceAllString(strings.TrimSpace(s), "")
 }
 
-func FindTeacher(teacherID int, teachers []models.Teacher) *models.Teacher {
-    var t uint 
-	for _, t = range teachers {
+func FindTeacher(teacherID uint, teachers []models.Teacher) *models.Teacher {
+	for _, t := range teachers {
 		if t.ID == teacherID {
 			return &t
 		}
@@ -104,32 +104,30 @@ func FindTeacher(teacherID int, teachers []models.Teacher) *models.Teacher {
 }
 
 
-func FindModuleForTeacher(teacherID int, slotType string, wishes []models.Voeux, available []models.Module,Niveau[]models.Niveau, currentHours int) *models.Module {
-	// Try priorities 1 to 3
-	for prio := 1; prio <= 3; prio++ {
-		for _, wish := range wishes {
-			if wish.TeacherID == teacherID && wish.Priority == prio {
-				// Check if teacher wants this type of class
-				if (slotType == "cours" && wish.WantsCours) ||
-					(slotType == "td" && wish.WantsTD) ||
-					(slotType == "tp" && wish.WantsTP) {
-					// Find the module in available modules
-					for _, module := range available {
-						if module.ID == wish.ModuleID {
-							hours := GetHoursForType(&module,wish.niveauID,slotType)
-							if hours > 0 && currentHours+hours <= 24 {
-								return &module
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return nil
+func FindModuleForTeacher(teacherID int,niveauID uint , slotType string, wishes []models.Voeux, available []models.Module,Niveau[]models.Niveau, currentHours int) *models.Module {
+    for prio := 1; prio <= 3; prio++ {
+        for _, v := range wishes {
+            if int(v.TeacherID) == teacherID && v.Priority == prio && v.NiveauID == niveauID {
+                if (slotType == "cours" && v.Cours) ||
+                   (slotType == "td" && v.Td) ||
+                   (slotType == "tp" && v.Tp) {
+                    
+                    for _, module := range available {
+                        if module.ID == v.ModuleID {
+                            hours := GetHoursForType(&module, niveauID, slotType)
+                            if hours > 0 && currentHours+hours <= 24 {
+                                return &module
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return nil
 }
 
-func GetHoursForType(module *models.Module, niveauID uint, slotType string) float64 {
+func GetHoursForType(module *models.Module, niveauID uint, slotType string) int {
 	for _, mn := range module.ModuleNiveaux {
 		if mn.NiveauID == niveauID {
 			switch slotType {
@@ -151,36 +149,8 @@ func GetHoursForType(module *models.Module, niveauID uint, slotType string) floa
 func FormBool(r *http.Request, key string) bool {
 	return r.FormValue(key) == "on"
 }
-func FindModuleForTeacher(
-    teacherID int,
-    niveauID uint,
-    slotType string,
-    voeux []models.Voeux,
-    available []models.Module,
-    currentHours float64,
-) *models.Module {
-    for prio := 1; prio <= 3; prio++ {
-        for _, v := range voeux {
-            if int(v.TeacherID) == teacherID && v.Priority == prio && v.NiveauID == niveauID {
-                if (slotType == "cours" && v.Cours) ||
-                   (slotType == "td" && v.Td) ||
-                   (slotType == "tp" && v.Tp) {
-                    
-                    for _, module := range available {
-                        if module.ID == v.ModuleID {
-                            hours := GetHoursForType(&module, niveauID, slotType)
-                            if hours > 0 && currentHours+hours <= 24 {
-                                return &module
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return nil
-}
 
+var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
 func GenerateJWT(user *models.User) (string, error) {
 	// Crée les claims avec la date d’expiration
 	claims := models.Claims{
