@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"Devenir_dev/internal/api/models"
-	"Devenir_dev/internal/api/services"
-	"Devenir_dev/internal/database"
-	"Devenir_dev/pkg"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
 	"os"
 	"strings"

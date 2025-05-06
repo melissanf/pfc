@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"Devenir_dev/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
 	"context"
 	"net/http"
 	"os"
@@ -9,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
+var JwtKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
 type contextKey string
 
 const userContextKey = contextKey("user")
@@ -30,7 +30,7 @@ func JwtMiddleware(next http.Handler) http.Handler {
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 		claims := &models.Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
+			return JwtKey, nil
 		})
 
 		if err != nil || !token.Valid {

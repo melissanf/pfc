@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"Devenir_dev/internal/database"
-	"Devenir_dev/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
 	"encoding/json"
 	"net/http"
 )

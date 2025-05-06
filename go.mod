@@ -1,4 +1,4 @@
-module Devenir_dev
+module github.com/ilyes-rhdi/Projet_s4
 
 go 1.23.0
 

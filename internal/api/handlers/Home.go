@@ -1,6 +1,6 @@
 package handlers
 import( 
-    "Devenir_dev/pkg"
+    "github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
  
 )

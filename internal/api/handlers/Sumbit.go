@@ -1,15 +1,12 @@
 package handlers
 
 import (
-	"Devenir_dev/internal/api/models"
-	"Devenir_dev/internal/api/services"
-	"Devenir_dev/internal/database"
-	"Devenir_dev/pkg"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
-	"time"
-
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 func Submit(res http.ResponseWriter, req *http.Request) {
@@ -51,22 +48,13 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 	}
 
 
-	claims := models.Claims{
-		UserID:   user.ID,
-		Username: user.Nom + " " + user.Prenom,
-		Role:     user.Role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-		},
-	}
-	
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecretKey)
+	token, err := GenerateJWT(user)
 	if err != nil {
 		http.Error(res, "Erreur lors de la génération du token", http.StatusInternalServerError)
 		return
 	}
-	res.Header().Set("Authorization", "Bearer "+tokenString)
+	res.Header().Set("Authorization", "Bearer "+token)
+	
 
 	// Redirection ou réponse JSON selon le cas
 	http.Redirect(res, req, "/Home", http.StatusFound)

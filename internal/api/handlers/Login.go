@@ -1,18 +1,14 @@
 package handlers
 
 import (
-	"Devenir_dev/internal/database"
-	"Devenir_dev/internal/api/services"
-	"Devenir_dev/pkg"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
-	"github.com/golang-jwt/jwt/v5"	
-	"os"
 )
 
-var jwtSecretKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
+
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
@@ -34,21 +30,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 
 	// Authentifie l'utilisateur
-	verified, isAdmin, message := utils.VerifyUser(db, identifier, password)
+	verified, user, message := utils.VerifyUser(db, identifier, password)
 	if !verified {
 		http.Error(w, message, http.StatusUnauthorized)
 		return
 	}
-
-	var name string
-	user, err := services.GetUserByEmail(db, identifier)
-	if err != nil {
-		http.Error(w, "Erreur lors de la récupération de l'utilisateur", http.StatusInternalServerError)
-		return
-	}
-	name = user.Nom + " " + user.Prenom
-
-	tokenString, err := pkg.GenerateToken(user.ID, name, user.Role)
+	tokenString, err := utils.GenerateJWT(&user)
 	if err != nil {
 		http.Error(w, "Erreur lors de la création du token", http.StatusInternalServerError)
 		return
@@ -72,5 +59,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	// Log de l'opération
-	fmt.Printf("Token JWT généré pour %s\n", name)
+	fmt.Printf("Token JWT généré pour %s\n", user.Nom)
 }

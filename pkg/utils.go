@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"Devenir_dev/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
 	"fmt"
 	"html/template"
 	"log"

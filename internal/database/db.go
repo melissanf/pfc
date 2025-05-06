@@ -5,7 +5,7 @@ import (
 	"log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"Devenir_dev/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
 )
 
 var DB *gorm.DB

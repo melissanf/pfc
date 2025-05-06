@@ -1,8 +1,8 @@
 package rooter
 
 import (
-	"Devenir_dev/internal/api/handlers"
-	"Devenir_dev/internal/api/middleware" // Assurez-vous que le bon chemin vers le middleware est utilisé
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/handlers"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware" // Assurez-vous que le bon chemin vers le middleware est utilisé
 
 	"github.com/gorilla/mux"
 )
@@ -12,7 +12,7 @@ func NewRouter() *mux.Router {
 
     // Routes accessibles à tous
     router.HandleFunc("/login", handlers.Login).Methods("GET", "POST")
-    router.HandleFunc("/submit", handlers.Submit).Methods("POST")
+    router.HandleFunc("/submit", handlers.Submit).Methods("GET","POST")
     router.HandleFunc("/home", handlers.Home).Methods("GET")
     router.HandleFunc("/home/profile", handlers.HandelProfile).Methods("GET")
     router.HandleFunc("/home/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("GET", "POST")

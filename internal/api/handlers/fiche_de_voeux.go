@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"Devenir_dev/internal/database"
-	"Devenir_dev/internal/api/models"
-	"Devenir_dev/internal/api/services"
-	"Devenir_dev/pkg"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
+	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"encoding/json"
 	"fmt"
-
 	"strconv"
 	"github.com/gorilla/mux"
 	"github.com/golang-jwt/jwt/v5"
@@ -36,7 +35,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 	claims := &jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(jwtSecretKey), nil
+		return []byte(JwtKey), nil
 	})
 	if err != nil || !token.Valid {
 		http.Error(res, "Token invalide", http.StatusUnauthorized)
