@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"Devenir_dev/internal/api/rooter"
-	"Devenir_dev/internal/api/middleware"
-	"Devenir_dev/internal/database"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/rooter"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"log"
 )
 

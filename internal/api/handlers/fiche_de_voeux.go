@@ -7,6 +7,7 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"github.com/gorilla/mux"
 	"github.com/golang-jwt/jwt/v5"
@@ -35,7 +36,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 	claims := &jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(JwtKey), nil
+		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
 	})
 	if err != nil || !token.Valid {
 		http.Error(res, "Token invalide", http.StatusUnauthorized)
@@ -148,7 +149,6 @@ func CreateVoeux(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(voeux)
 }
 
-// ✏️ PUT /voeux/{id}
 func UpdateVoeux(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])

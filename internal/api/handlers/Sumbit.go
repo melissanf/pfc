@@ -38,9 +38,8 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 
 	utils.ValidateInput(user)
 	utils.SanitizeInput(&user)
-
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	user.Password = string(hashedPassword)
+	user.Password = string(hashedPassword[:])
 
 	if err := services.CreateUser(db, &user); err != nil {
 		http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
@@ -48,7 +47,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 	}
 
 
-	token, err := GenerateJWT(user)
+	token, err := utils.GenerateJWT(&user)
 	if err != nil {
 		http.Error(res, "Erreur lors de la génération du token", http.StatusInternalServerError)
 		return
@@ -57,5 +56,5 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 	
 
 	// Redirection ou réponse JSON selon le cas
-	http.Redirect(res, req, "/Home", http.StatusFound)
+	http.Redirect(res, req, "/home", http.StatusFound)
 }

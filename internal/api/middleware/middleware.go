@@ -22,8 +22,12 @@ func JwtMiddleware(next http.Handler) http.Handler {
 		}
 
 		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		if authHeader == ""  {
 			http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
+			return
+		}
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			http.Error(w, "lol", http.StatusUnauthorized)
 			return
 		}
 
