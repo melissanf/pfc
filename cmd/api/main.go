@@ -6,16 +6,18 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/rooter"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"os"
 	"log"
 )
 
-const port = ":8000"
 func main (){
 	database.InitDB()
 	app := rooter.NewRouter()
 	app.Use(middleware.JwtMiddleware)
-	fmt.Println("(http://localhost"+port+"/login) le serveur est lancer sur ce lien ")
-	
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Port par défaut
+	}
 	err := http.ListenAndServe(port, app)
 	if err != nil {
 		log.Fatal(err)
