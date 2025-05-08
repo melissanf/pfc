@@ -15,7 +15,7 @@ func main (){
 	app.Use(middleware.JwtMiddleware)
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // Port par défaut
+		port = "8000" // Port par défaut
 	}
 	err := http.ListenAndServe(port, app)
 	if err != nil {
