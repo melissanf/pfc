@@ -19,7 +19,6 @@ type Pagedata struct {
 	Currentuser models.User
 	Users       []models.User
 }
-
 func Rendertemplates(res http.ResponseWriter, tmpl string, data interface{}) {
 	t, err := template.ParseFiles("templates/" + tmpl + ".page.tmpl")
 	if err != nil {
@@ -49,20 +48,14 @@ func VerifyUser(db *gorm.DB, identifier, password string) (bool, models.User, st
 	return true, user, "User verified."
 }
 
-// ValidateInput vérifie la validité des champs utilisateur
 func ValidateInput(user models.User) (bool, string) {
-	// Vérification des champs vides
 	if user.Nom == "" || user.Prenom == "" || user.Password == "" || user.Role == "" || user.Email == "" {
 		return false, "All fields (nom, prenom, email, password, role) are required."
 	}
-
-	// Vérification de l'email avec une expression régulière
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
 	if !emailRegex.MatchString(user.Email) {
 		return false, "Invalid email format."
 	}
-
-	// Vérification de la longueur du mot de passe (ex: minimum 6 caractères)
 	if len(user.Password) < 6 {
 		return false, "Password must be at least 6 characters long."
 	}
@@ -132,11 +125,11 @@ func GetHoursForType(module *models.Module, niveauID uint, slotType string) int 
 		if mn.NiveauID == niveauID {
 			switch slotType {
 			case "cours":
-				return mn.ChargeCours
+				return mn.NbCours
 			case "td":
-				return mn.ChargeTD
+				return mn.NbTD
 			case "tp":
-				return mn.ChargeTP
+				return mn.NbTP
 			}
 		}
 	}
@@ -173,4 +166,50 @@ func GenerateJWT(user *models.User) (string, error) {
 	}
 
 	return tokenString, nil
+}
+func RecalculerChargeHoraire(db *gorm.DB) error {
+	coefficients := map[string]float64{
+		"Cours": 3.0,
+		"TD":    2.0,
+		"TP":    1.5,
+	}
+
+	var affectations []models.Affectation
+	if err := db.Find(&affectations).Error; err != nil {
+		return err
+	}
+
+	chargeParProf := make(map[uint]float64)
+
+	for _, a := range affectations {
+		var mn models.ModuleNiveau
+		err := db.Where("module_id = ? AND niveau_id = ?", a.ModuleID, a.NiveauID).First(&mn).Error
+		if err != nil {
+			continue // ignorer si le lien module-niveau est manquant
+		}
+
+		var nbSeances int
+		switch a.TypeSeance {
+		case "Cours":
+			nbSeances = mn.NbCours
+		case "TD":
+			nbSeances = mn.NbTD
+		case "TP":
+			nbSeances = mn.NbTP
+		default:
+			continue
+		}
+
+		coef := coefficients[a.TypeSeance]
+		charge := float64(nbSeances) * coef * float64(a.Groupe) // charge totale pour ce prof
+		chargeParProf[a.TeacherID] += charge
+	}
+
+	for teacherID, charge := range chargeParProf {
+		if err := db.Model(&models.Teacher{}).Where("id = ?", teacherID).Update("charge_horaire", charge).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

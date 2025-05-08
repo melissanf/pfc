@@ -1,7 +1,5 @@
 package models
 
-
-
 type Speciality struct {
     ID       uint      `gorm:"primaryKey"`
     Nom      string    `gorm:"not null"`

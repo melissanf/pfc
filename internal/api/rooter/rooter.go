@@ -2,7 +2,7 @@ package rooter
 
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/handlers"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware" // Assurez-vous que le bon chemin vers le middleware est utilisé
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
     "net/http"
     "fmt"   
 	"github.com/gorilla/mux"
@@ -20,11 +20,9 @@ func NewRouter() *mux.Router {
     router.HandleFunc("/home", handlers.Home).Methods("GET")
     router.HandleFunc("/home/profile", handlers.HandelProfile).Methods("GET")
     router.HandleFunc("/home/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("GET", "POST")
-
     // Routes protégées par JWT et rôle admin pour les utilisateurs
     adminRouter := router.PathPrefix("/admin").Subrouter()
     adminRouter.Use(middleware.IsAdmin)
-
     // Routes pour les utilisateurs, accessibles uniquement par l'admin
     adminRouter.HandleFunc("/users", handlers.GetAllUsers).Methods("GET")
     adminRouter.HandleFunc("/users/{id}", handlers.GetUserByID).Methods("GET")

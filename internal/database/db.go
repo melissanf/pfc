@@ -26,7 +26,6 @@ func InitDB() {
 		&models.Niveau{},
 		&models.Voeux{},
 		&models.Speciality{},
-		// ajoute d'autres structs ici
 	)
 
 	if err != nil {
