@@ -16,7 +16,7 @@ const userContextKey = contextKey("user")
 
 func JwtMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/login" || r.URL.Path == "/submit" {
+		if r.URL.Path == "/login" || r.URL.Path == "/submit" || r.URL.Path == "/" {
 			next.ServeHTTP(w, r)
 			return
 		}
