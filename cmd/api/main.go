@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/rooter"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
