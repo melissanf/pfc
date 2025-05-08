@@ -21,7 +21,7 @@ type Pagedata struct {
 }
 
 func Rendertemplates(res http.ResponseWriter, tmpl string, data interface{}) {
-	t, err := template.ParseFiles("C:\\Users\\PC\\OneDrive\\Documents\\futur\\Devenir_dev\\templates\\" + tmpl + ".page.tmpl")
+	t, err := template.ParseFiles("/templates/" + tmpl + ".page.tmpl")
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
