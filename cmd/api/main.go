@@ -13,7 +13,7 @@ func main (){
 	database.InitDB()
 	app := rooter.NewRouter()
 	app.Use(middleware.JwtMiddleware)
-	port := os.Getenv("PORT")
+	port := "0.0.0.0:" + os.Getenv("PORT")
 	if port == "" {
 		port = "8000" // Port par défaut
 	}
