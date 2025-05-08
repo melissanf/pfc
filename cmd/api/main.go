@@ -9,15 +9,17 @@ import (
 	"log"
 )
 
-func main (){
+func main() {
 	database.InitDB()
 	app := rooter.NewRouter()
 	app.Use(middleware.JwtMiddleware)
-	port := "0.0.0.0:" + os.Getenv("PORT")
+
+	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8000" // Port par défaut
+		port = "8000" // Port par défaut localement
 	}
-	err := http.ListenAndServe(port, app)
+
+	err := http.ListenAndServe("0.0.0.0:"+port, app)
 	if err != nil {
 		log.Fatal(err)
 	}

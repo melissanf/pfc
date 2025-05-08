@@ -3,7 +3,8 @@ package rooter
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/handlers"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware" // Assurez-vous que le bon chemin vers le middleware est utilisé
-
+    "net/http"
+    "fmt"   
 	"github.com/gorilla/mux"
 )
 
@@ -11,6 +12,9 @@ func NewRouter() *mux.Router {
     router := mux.NewRouter()
 
     // Routes accessibles à tous
+    router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintln(w, "API en ligne 🚀")
+    }).Methods("GET")
     router.HandleFunc("/login", handlers.Login).Methods("GET", "POST")
     router.HandleFunc("/submit", handlers.Submit).Methods("GET","POST")
     router.HandleFunc("/home", handlers.Home).Methods("GET")
