@@ -3,19 +3,16 @@ package rooter
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/handlers"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
-    "net/http"
-    "fmt"   
 	"github.com/gorilla/mux"
 )
 
 func NewRouter() *mux.Router {
     router := mux.NewRouter()
 
-    // Routes accessibles à tous
-    router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintln(w, "API en ligne 🚀")
-    }).Methods("GET")
-    router.HandleFunc("/login", handlers.Login).Methods("GET", "POST")
+	// ---------- ROUTES PUBLIQUES ----------
+	router.HandleFunc("/", handlers.Home).Methods("GET")
+	router.HandleFunc("/login", handlers.Login).Methods("POST")
+	router.HandleFunc("/logout", handlers.Logout).Methods("POST")
     router.HandleFunc("/submit", handlers.Submit).Methods("GET","POST")
     router.HandleFunc("/home", handlers.Home).Methods("GET")
     router.HandleFunc("/home/profile", handlers.HandelProfile).Methods("GET")
@@ -25,21 +22,18 @@ func NewRouter() *mux.Router {
     adminRouter.Use(middleware.IsAdmin)
     // Routes pour les utilisateurs, accessibles uniquement par l'admin
     adminRouter.HandleFunc("/users", handlers.GetAllUsers).Methods("GET")
-    adminRouter.HandleFunc("/users/{id}", handlers.GetUserByID).Methods("GET")
     adminRouter.HandleFunc("/users", handlers.CreateUser).Methods("POST")
     adminRouter.HandleFunc("/users/{id}", handlers.UpdateUser).Methods("PUT")
     adminRouter.HandleFunc("/users/{id}", handlers.DeleteUser).Methods("DELETE")
 
     // Routes pour les enseignants, accessibles uniquement par l'admin
     adminRouter.HandleFunc("/teachers", handlers.GetAllTeachers).Methods("GET")
-    adminRouter.HandleFunc("/teachers/{id}", handlers.GetTeacherByID).Methods("GET")
     adminRouter.HandleFunc("/teachers", handlers.CreateTeacher).Methods("POST")
     adminRouter.HandleFunc("/teachers/{id}", handlers.UpdateTeacher).Methods("PUT")
     adminRouter.HandleFunc("/teachers/{id}", handlers.DeleteTeacher).Methods("DELETE")
 
     // Routes pour les voeux, accessibles uniquement par l'admin
     adminRouter.HandleFunc("/voeux", handlers.GetAllVoeux).Methods("GET")
-    adminRouter.HandleFunc("/voeux/{id}", handlers.GetVoeuxByID).Methods("GET")
     adminRouter.HandleFunc("/voeux", handlers.CreateVoeux).Methods("POST")
     adminRouter.HandleFunc("/voeux/{id}", handlers.UpdateVoeux).Methods("PUT")
     adminRouter.HandleFunc("/voeux/{id}", handlers.DeleteVoeux).Methods("DELETE")

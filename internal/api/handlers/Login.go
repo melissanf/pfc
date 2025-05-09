@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"github.com/ilyes-rhdi/Projet_s4/pkg"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -35,29 +34,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, message, http.StatusUnauthorized)
 		return
 	}
-	tokenString, err := utils.GenerateJWT(&user)
+	token, err := utils.GenerateJWT(&user)
 	if err != nil {
 		http.Error(w, "Erreur lors de la création du token", http.StatusInternalServerError)
 		return
 	}
-
-	// Réponse JSON avec le token
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": tokenString,
-	})
-
-	// Optionnel : Stocker le token dans un cookie HTTP-only sécurisé
-	/*
-		http.SetCookie(w, &http.Cookie{
-			Name:     "auth-token",
-			Value:    tokenString,
-			Path:     "/",
-			HttpOnly: true,
-			Expires:  time.Now().Add(24 * time.Hour),
-		})
-	*/
-
-	// Log de l'opération
+	w.Header().Set("Authorization", "Bearer "+token)
 	fmt.Printf("Token JWT généré pour %s\n", user.Nom)
 }
