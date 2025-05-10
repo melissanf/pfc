@@ -6,20 +6,9 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
-	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
 func Submit(res http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		utils.Rendertemplates(res, "Submit", nil)
-		return
-	}
-
-	if req.Method != http.MethodPost {
-		http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
 	db := database.GetDB()
 
 	err := req.ParseForm()
@@ -33,6 +22,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		Prenom:   req.FormValue("prenom"),
 		Email:    req.FormValue("email"),
 		Password: req.FormValue("password"),
+		Numero: req.FormValue("numero"),
 		Role:     models.Role(req.FormValue("role")), // Assure-toi que la valeur correspond bien à un rôle valide
 	}
 
@@ -53,8 +43,4 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	res.Header().Set("Authorization", "Bearer "+token)
-	
-
-	// Redirection ou réponse JSON selon le cas
-	http.Redirect(res, req, "/home", http.StatusFound)
 }

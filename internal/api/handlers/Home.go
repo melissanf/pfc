@@ -1,14 +1,11 @@
 package handlers
 import( 
-    "github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
- 
 )
 
 
-func Home(res http.ResponseWriter, req *http.Request){
-
-
-	utils.Rendertemplates(res,"Home", nil)
+func Home(w http.ResponseWriter, r *http.Request){
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Page d'accueil ."))
 		
 }

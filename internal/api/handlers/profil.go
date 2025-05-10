@@ -4,9 +4,9 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
-	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
 	"os"
+	"encoding/json"
 	"strings"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -43,7 +43,7 @@ func HandelProfile(res http.ResponseWriter, req *http.Request) {
 	}
     db:=database.GetDB()
 	// Récupérer l'utilisateur à partir de l'email
-	user, err := services.GetUserByEmail(db, email) // Assurez-vous que `db` est accessible ici
+	user, err := services.GetUserByEmail(db, email) 
 	if err != nil {
 		http.Error(res, "Utilisateur non trouvé", http.StatusNotFound)
 		return
@@ -54,7 +54,10 @@ func HandelProfile(res http.ResponseWriter, req *http.Request) {
 		Nom:    user.Nom,
 		Prenom: user.Prenom,
 		Email:  user.Email,
+		Numero: user.Numero,
 	}
-
-	utils.Rendertemplates(res, "Profil", Data)
+	if err :=json.NewEncoder(res).Encode(Data); err!=nil {	
+		http.Error(res, "Erreur lors de l'envoi de la réponse", http.StatusInternalServerError)
+		return
+	}
 }

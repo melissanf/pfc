@@ -11,6 +11,12 @@ func GetModuleByName(db *gorm.DB, name string) (*models.Module, error) {
     }
     return &module, nil
 }
+func Createmodule(db *gorm.DB, module *models.Module) (*models.Module, error) {
+	if err := db.Create(module).Error; err != nil {
+		return nil, err
+	}
+	return module, nil
+}
 func RemoveModule(moduleID int, modules []models.Module) []models.Module {
 	var result []models.Module
 	for _, m := range modules {

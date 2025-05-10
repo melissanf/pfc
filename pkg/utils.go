@@ -1,9 +1,6 @@
 package utils
-
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"regexp"
@@ -18,18 +15,6 @@ import (
 type Pagedata struct {
 	Currentuser models.User
 	Users       []models.User
-}
-func Rendertemplates(res http.ResponseWriter, tmpl string, data interface{}) {
-	t, err := template.ParseFiles("templates/" + tmpl + ".page.tmpl")
-	if err != nil {
-		http.Error(res, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = t.Execute(res, data)
-	if err != nil {
-		http.Error(res, "Error executing template", http.StatusInternalServerError)
-		fmt.Println("Error executing template:", err)
-	}
 }
 func VerifyUser(db *gorm.DB, identifier, password string) (bool, models.User, string) {
 	var user models.User
@@ -49,7 +34,7 @@ func VerifyUser(db *gorm.DB, identifier, password string) (bool, models.User, st
 }
 
 func ValidateInput(user models.User) (bool, string) {
-	if user.Nom == "" || user.Prenom == "" || user.Password == "" || user.Role == "" || user.Email == "" {
+	if user.Nom == "" || user.Prenom == "" || user.Password == "" || user.Role == "" || user.Email == "" || user.Numero == "" {
 		return false, "All fields (nom, prenom, email, password, role) are required."
 	}
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
@@ -58,6 +43,9 @@ func ValidateInput(user models.User) (bool, string) {
 	}
 	if len(user.Password) < 6 {
 		return false, "Password must be at least 6 characters long."
+	}
+	if len(user.Numero) != 10  || user.Numero[0] != '0' {
+		return false, "Phone number must be 10 digits long."
 	}
 
 	return true, ""
@@ -79,6 +67,7 @@ func SanitizeInput(user *models.User) {
 	user.Prenom = clean(user.Prenom, re)
 	user.Password = clean(user.Password, re)
 	user.Email = clean(user.Email, re)
+	user.Numero = clean(user.Numero, re)
 	user.Role = sanitizeRole(user.Role)
 }
 

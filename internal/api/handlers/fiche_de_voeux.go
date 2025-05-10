@@ -17,16 +17,6 @@ import (
 
 
 func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		utils.Rendertemplates(res, "Fiche", nil)
-		return
-	}
-
-	if req.Method != http.MethodPost {
-		http.Error(res, "Méthode non autorisée", http.StatusMethodNotAllowed)
-		return
-	}
-
 	authHeader := req.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 		http.Error(res, "Token manquant", http.StatusUnauthorized)
@@ -109,9 +99,12 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
-
+    res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusCreated)
-	json.NewEncoder(res).Encode(map[string]string{"message": "Les vœux ont bien été enregistrés"})
+	if err :=json.NewEncoder(res).Encode(map[string]string{"message": "Les vœux ont bien été enregistrés"}); err!=nil {	
+		http.Error(res, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
+		return
+	}
 }
 func GetAllVoeux(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
@@ -120,7 +113,11 @@ func GetAllVoeux(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(voeux)
+	w.Header().Set("Content-Type", "application/json")
+	if err:=json.NewEncoder(w).Encode(voeux); err!=nil {	
+		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
+		return
+	}
 }
 
 func GetVoeuxByID(w http.ResponseWriter, r *http.Request) {
@@ -131,10 +128,13 @@ func GetVoeuxByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Vœu non trouvé", http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(voeux)
+	w.Header().Set("Content-Type", "application/json")
+	if err:=json.NewEncoder(w).Encode(voeux); err!=nil {	
+		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
+		return
+	}
 }
 
-// ➕ POST /voeux
 func CreateVoeux(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 	var voeux models.Voeux
@@ -146,7 +146,11 @@ func CreateVoeux(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(voeux)
+	w.Header().Set("Content-Type", "application/json")
+	if err:=json.NewEncoder(w).Encode(voeux); err!=nil {	
+		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
+		return
+	}
 }
 
 func UpdateVoeux(w http.ResponseWriter, r *http.Request) {
@@ -165,10 +169,14 @@ func UpdateVoeux(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.Model(&voeux).Updates(updated)
-	json.NewEncoder(w).Encode(voeux)
+	w.Header().Set("Content-Type", "application/json")
+	if err:=json.NewEncoder(w).Encode(voeux); err!=nil {	
+		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
+		return
+	}
 }
 
-// 🗑️ DELETE /voeux/{id}
+
 func DeleteVoeux(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])

@@ -52,7 +52,6 @@ func JwtMiddleware(next http.Handler) http.Handler {
 
 func IsAdmin(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Récupère les claims depuis le contexte
         claims, ok := r.Context().Value("user").(*models.Claims)
         if !ok {
             http.Error(w, "Erreur de récupération des claims", http.StatusInternalServerError)

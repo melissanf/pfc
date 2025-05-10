@@ -14,12 +14,17 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/login", handlers.Login).Methods("POST")
 	router.HandleFunc("/logout", handlers.Logout).Methods("POST")
     router.HandleFunc("/submit", handlers.Submit).Methods("GET","POST")
-    router.HandleFunc("/home", handlers.Home).Methods("GET")
-    router.HandleFunc("/home/profile", handlers.HandelProfile).Methods("GET")
-    router.HandleFunc("/home/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("GET", "POST")
+    //Routes pour lmes enseignants
+    ProfRouter := router.PathPrefix("/Enseigniant").Subrouter()
+    ProfRouter.HandleFunc("/profile", handlers.HandelProfile).Methods("GET")
+    ProfRouter.HandleFunc("/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("GET", "POST")
+    ProfRouter.HandleFunc("/commentaire", handlers.CreateCommentaire).Methods("GET", "POST")
+    ProfRouter.HandleFunc("/modules", handlers.GetAllModules).Methods("GET")
+
     // Routes protégées par JWT et rôle admin pour les utilisateurs
     adminRouter := router.PathPrefix("/admin").Subrouter()
     adminRouter.Use(middleware.IsAdmin)
+
     // Routes pour les utilisateurs, accessibles uniquement par l'admin
     adminRouter.HandleFunc("/users", handlers.GetAllUsers).Methods("GET")
     adminRouter.HandleFunc("/users", handlers.CreateUser).Methods("POST")
@@ -38,7 +43,11 @@ func NewRouter() *mux.Router {
     adminRouter.HandleFunc("/voeux/{id}", handlers.UpdateVoeux).Methods("PUT")
     adminRouter.HandleFunc("/voeux/{id}", handlers.DeleteVoeux).Methods("DELETE")
 
-    // Route pour les modules (accessible par les utilisateurs connectés)
-    router.HandleFunc("/modules", handlers.GetAllModules).Methods("GET")
+    // Routes pour les commentaire, accessibles uniquement par l'admin
+    adminRouter.HandleFunc("/commentaire", handlers.CreateCommentaire).Methods("POST")
+    adminRouter.HandleFunc("/commentaire/{id}", handlers.DeleteCommentaire).Methods("DELETE")
+    adminRouter.HandleFunc("/commentaire/{id}", handlers.UpdateCommentaire).Methods("PUT")
+    adminRouter.HandleFunc("/Notify", handlers.GetNotifications).Methods("GET")
+   
     return router
 }

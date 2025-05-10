@@ -19,7 +19,8 @@ func main() {
 		port = "8000" // Port par défaut localement
 	}
 
-	err := http.ListenAndServe("0.0.0.0:"+port, app)
+
+	err := http.ListenAndServe(":"+port, app)
 	if err != nil {
 		log.Fatal(err)
 	}

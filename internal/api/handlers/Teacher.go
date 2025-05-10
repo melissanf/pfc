@@ -1,19 +1,20 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"encoding/json"
 	"net/http"
 	"strconv"
 
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+
 	"github.com/gorilla/mux"
 )
 
-// 🔍 GET /teachers
 func GetAllTeachers(w http.ResponseWriter, r *http.Request) {
 	var teachers []models.Teacher
-	db := database.GetDB() // Obtenir la connexion DB
+	db := database.GetDB() 
 
 	if err := db.Preload("User").Preload("Specialities").Find(&teachers).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -22,11 +23,10 @@ func GetAllTeachers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(teachers)
 }
 
-// 👤 GET /teachers/{id}
 func GetTeacherByID(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	var teacher models.Teacher
-	db := database.GetDB() // Obtenir la connexion DB
+	db := database.GetDB()
 
 	if err := db.Preload("User").Preload("Specialities").First(&teacher, id).Error; err != nil {
 		http.Error(w, "Professeur non trouvé", http.StatusNotFound)
@@ -35,27 +35,24 @@ func GetTeacherByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(teacher)
 }
 
-// ➕ POST /teachers
 func CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	var teacher models.Teacher
 	if err := json.NewDecoder(r.Body).Decode(&teacher); err != nil {
 		http.Error(w, "Données invalides", http.StatusBadRequest)
 		return
 	}
-	db := database.GetDB() // Obtenir la connexion DB
+	db := database.GetDB() 
 
-	if err := db.Create(&teacher).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	json.NewEncoder(w).Encode(teacher)
+	if err :=services.CreateTeacher(db, &teacher); err != nil {
+	   json.NewEncoder(w).Encode(teacher)
+   	   return
+    }
 }
 
-// ✏️ PUT /teachers/{id}
 func UpdateTeacher(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	var teacher models.Teacher
-	db := database.GetDB() // Obtenir la connexion DB
+	db := database.GetDB() 
 
 	if err := db.First(&teacher, id).Error; err != nil {
 		http.Error(w, "Professeur non trouvé", http.StatusNotFound)
@@ -72,10 +69,9 @@ func UpdateTeacher(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(teacher)
 }
 
-// 🗑️ DELETE /teachers/{id}
 func DeleteTeacher(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
-	db := database.GetDB() // Obtenir la connexion DB
+	db := database.GetDB()
 
 	if err := db.Delete(&models.Teacher{}, id).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

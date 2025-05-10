@@ -3,22 +3,12 @@ package handlers
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"github.com/ilyes-rhdi/Projet_s4/pkg"
-	"fmt"
 	"net/http"
 )
 
 
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		utils.Rendertemplates(w, "Login", nil)
-		return
-	}
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-		return
-	}
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Erreur dans le formulaire", http.StatusBadRequest)
 		return
@@ -40,5 +30,4 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Authorization", "Bearer "+token)
-	fmt.Printf("Token JWT généré pour %s\n", user.Nom)
 }

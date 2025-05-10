@@ -13,7 +13,7 @@ var DB *gorm.DB
 func InitDB() {
 	var err error
 
-	dsn := "root:JEayCZtOkAwryhunDAHbNTmPVdicvlfM@tcp(caboose.proxy.rlwy.net:14865)/railway"
+	dsn := "root:ilyesgamer2005@@tcp(127.0.0.1:3306)/gestion_universite?parseTime=true"
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Erreur de connexion à la base de données:", err)
@@ -26,6 +26,8 @@ func InitDB() {
 		&models.Niveau{},
 		&models.Voeux{},
 		&models.Speciality{},
+		&models.Commentaire{},
+		&models.Notif{},
 	)
 
 	if err != nil {
