@@ -6,26 +6,18 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
+	"encoding/json"
 	"golang.org/x/crypto/bcrypt"
 )
 func Submit(res http.ResponseWriter, req *http.Request) {
 	db := database.GetDB()
+    var user models.User
 
-	err := req.ParseForm()
+	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-		http.Error(res, "Error parsing form data", http.StatusBadRequest)
+		http.Error(res, "Données invalides", http.StatusBadRequest)
 		return
 	}
-
-	user := models.User{
-		Nom:      req.FormValue("nom"),
-		Prenom:   req.FormValue("prenom"),
-		Email:    req.FormValue("email"),
-		Password: req.FormValue("password"),
-		Numero: req.FormValue("numero"),
-		Role:     models.Role(req.FormValue("role")), // Assure-toi que la valeur correspond bien à un rôle valide
-	}
-
 	utils.ValidateInput(user)
 	utils.SanitizeInput(&user)
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)

@@ -3,18 +3,25 @@ package database
 import (
 	"fmt"
 	"log"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"os"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
-
 func InitDB() {
-	var err error
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		log.Fatal("Erreur de chargement du fichier .env:", err)
+	}
+	dsn := os.Getenv("DSN")
+		if dsn == "" {
+		log.Fatal("DSN non défini dans .env")
+	}
 
-	dsn := "root:ilyesgamer2005@@tcp(127.0.0.1:3306)/gestion_universite?parseTime=true"
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Erreur de connexion à la base de données:", err)
 	}
