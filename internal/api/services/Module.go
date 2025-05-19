@@ -5,7 +5,7 @@ import (
 	)	
 func GetModuleByName(db *gorm.DB, name string) (*models.Module, error) {
     var module models.Module
-    err := db.Where("name = ?", name).First(&module).Error
+    err := db.Where("nom = ?", name).First(&module).Error
     if err != nil {
         return nil, err
     }

@@ -7,6 +7,6 @@ type Niveau struct {
     Spec        string   `gorm:"not null"`
     Annee       string   `gorm:"not null"`
     Section     string   `gorm:"not null"`
-    ModuleNiveaux []ModuleNiveau
+    ModuleNiveaux []ModuleNiveau `gorm:"foreignKey:NiveauID"`
     Voeux       []Voeux  `gorm:"foreignKey:NiveauID"`
 }

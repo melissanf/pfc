@@ -1,12 +1,13 @@
 package main
 
 import (
-	"net/http"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/rooter"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
-	"os"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
+	"github.com/ilyes-rhdi/Projet_s4/internal/api/rooter"
+	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 )
 
 func main() {
@@ -19,7 +20,7 @@ func main() {
 		port = "8000" // Port par défaut localement
 	}
 
-
+    fmt.Println("http://localhost:8000/")
 	err := http.ListenAndServe(":"+port, app)
 	if err != nil {
 		log.Fatal(err)

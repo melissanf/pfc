@@ -4,13 +4,10 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/database"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
-	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"github.com/gorilla/mux"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strings"
 )
@@ -23,25 +20,18 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-	claims := &jwt.MapClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
-	})
-	if err != nil || !token.Valid {
-		http.Error(res, "Token invalide", http.StatusUnauthorized)
-		return
-	}
-
-	profIDFloat, ok := (*claims)["user_id"].(float64)
+	claims, ok := req.Context().Value("user").(*models.Claims)
 	if !ok {
-		http.Error(res, "ID utilisateur non trouvé", http.StatusUnauthorized)
+		http.Error(res, "Erreur de récupération des claims", http.StatusInternalServerError)
 		return
 	}
-	profID := uint(profIDFloat)
-
 	db := database.GetDB()
-
+	teacher , err :=services.GetTeacherByUserID(db, claims.UserID)
+	if err != nil {	
+		http.Error(res, "Erreur lors de la récupération du professeur", http.StatusInternalServerError)
+		return	
+	}
+	profID := teacher.ID
 	count, err := services.CountVoeuxByTeacherID(db, profID)
 	if err != nil {
 		http.Error(res, "Erreur lors de la vérification", http.StatusInternalServerError)
@@ -60,24 +50,23 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 	}
 	var modules []ModuleData
 	decoder := json.NewDecoder(req.Body)
-	err := decoder.Decode(&modules)
+	err = decoder.Decode(&modules)
 	if err != nil {
 		http.Error(res, "JSON invalide", http.StatusBadRequest)
 		return
 	}
-	i := 0;
-	for _, Module := range modules {
-        if Module.ModuleName == "" || module.NiveauName ==""{
+	for i, Module := range modules {
+        if Module.ModuleName == "" || Module.NiveauName ==""{
 			http.Error(res, fmt.Sprintf("donner recus vide  "), http.StatusNotFound)
 			return
 		}
-		priority := i++;
-		module, err := services.GetModuleByName(db, module.ModuleName)
+		priority := i+1
+		module, err := services.GetModuleByName(db, Module.ModuleName)
 		if err != nil {
 			http.Error(res, fmt.Sprintf("Module introuvable : %s", Module.ModuleName), http.StatusNotFound)
 			return
 		}
-		niveau, err := services.GetniveauBySpecAnnee(db,module.NiveauName)
+		niveau, err := services.GetNiveauBySpecAnnee(db,Module.NiveauName)
 		if err != nil {
 			http.Error(res, fmt.Sprintf("Niveau introuvable : %s", Module.NiveauName), http.StatusNotFound)
 			return
@@ -88,7 +77,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 		if exists {
-			http.Error(res, fmt.Sprintf("Un vœu identique existe déjà pour le module '%s' et niveau spécifié.", moduleName), http.StatusBadRequest)
+			http.Error(res, fmt.Sprintf("Un vœu identique existe déjà pour le module '%s' et niveau spécifié.", Module.ModuleName), http.StatusBadRequest)
 			return
 		}
 
@@ -102,6 +91,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			Priority:  priority,
 		}
 		if err := services.CreateVoeux(db, voeux); err != nil {
+			fmt.Println(err)
 			http.Error(res, "Erreur lors de l'insertion", http.StatusInternalServerError)
 			return
 		}

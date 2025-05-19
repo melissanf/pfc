@@ -5,5 +5,5 @@ type Organigramme struct {
     Annee      string  `gorm:"not null"`
     Semestre   string  `gorm:"not null"`
     IsValide   bool    `gorm:"default:false"`
-    Affectations []Affectation `gorm:"many2many:organigramme_affectations"`
+    Affectations []Affectation `gorm:"many2many:Affectation"`
 }

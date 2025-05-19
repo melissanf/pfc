@@ -27,6 +27,16 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
 		return
 	}
+	if user.Role == "professeur" {
+		teacher := models.Teacher{
+			UserID: user.ID,
+			ChargeHoraire: 0,
+		};
+		if err := services.CreateTeacher(db, &teacher); err != nil {
+			http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
+			return
+		}
+	}
 
 
 	token, err := utils.GenerateJWT(&user)
