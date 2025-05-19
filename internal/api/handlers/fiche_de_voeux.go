@@ -51,31 +51,38 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Vous avez déjà soumis 3 vœux.", http.StatusForbidden)
 		return
 	}
-
-	for i := 1; i <= 3; i++ {
-		moduleName := req.FormValue(fmt.Sprintf("module_name_%d", i))
-		if moduleName == "" {
-			continue
-		}
-		niveauIDStr := req.FormValue(fmt.Sprintf("niveau_id_%d", i))
-		niveauIDUint, err := strconv.ParseUint(niveauIDStr, 10, 64)
-		if err != nil || niveauIDUint == 0 {
-			http.Error(res, "Niveau invalide", http.StatusBadRequest)
+    type ModuleData struct {
+		ModuleName string `json:"module_name"`
+		NiveauName   string   `json:"niveau_name"`
+		TP         bool   `json:"tp"`
+		TD         bool   `json:"td"`
+		Cour       bool   `json:"cour"`
+	}
+	var modules []ModuleData
+	decoder := json.NewDecoder(req.Body)
+	err := decoder.Decode(&modules)
+	if err != nil {
+		http.Error(res, "JSON invalide", http.StatusBadRequest)
+		return
+	}
+	i := 0;
+	for _, Module := range modules {
+        if Module.ModuleName == "" || module.NiveauName ==""{
+			http.Error(res, fmt.Sprintf("donner recus vide  "), http.StatusNotFound)
 			return
 		}
-		niveauID := uint(niveauIDUint)
-
-		isTP := utils.FormBool(req, fmt.Sprintf("tp_%d", i))
-		isTD := utils.FormBool(req, fmt.Sprintf("td_%d", i))
-		isCour := utils.FormBool(req, fmt.Sprintf("cour_%d", i))
-		priority := i
-
-		module, err := services.GetModuleByName(db, moduleName)
+		priority := i++;
+		module, err := services.GetModuleByName(db, module.ModuleName)
 		if err != nil {
-			http.Error(res, fmt.Sprintf("Module introuvable : %s", moduleName), http.StatusNotFound)
+			http.Error(res, fmt.Sprintf("Module introuvable : %s", Module.ModuleName), http.StatusNotFound)
 			return
 		}
-		exists, err := services.VoeuxExactExists(db, profID, module.ID, niveauID, isTP, isTD, isCour)
+		niveau, err := services.GetniveauBySpecAnnee(db,module.NiveauName)
+		if err != nil {
+			http.Error(res, fmt.Sprintf("Niveau introuvable : %s", Module.NiveauName), http.StatusNotFound)
+			return
+		}
+		exists, err := services.VoeuxExactExists(db, profID, module.ID, niveau.ID, Module.TP, Module.TD, Module.Cour)
 		if err != nil {
 			http.Error(res, "Erreur lors de la vérification des doublons", http.StatusInternalServerError)
 			return
@@ -88,10 +95,10 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		voeux := &models.Voeux{
 			TeacherID: profID,
 			ModuleID:  module.ID,
-			NiveauID:  niveauID,
-			Tp:        isTP,
-			Td:        isTD,
-			Cours:     isCour,
+			NiveauID:  niveau.ID,
+			Tp:        Module.TP,
+			Td:        Module.TD,
+			Cours:     Module.Cour,
 			Priority:  priority,
 		}
 		if err := services.CreateVoeux(db, voeux); err != nil {
