@@ -32,13 +32,13 @@ func NewRouter() *mux.Router {
     adminRouter.HandleFunc("/users/{id}", handlers.DeleteUser).Methods("DELETE")
 
     // Routes pour les enseignants, accessibles uniquement par l'admin
-    adminRouter.HandleFunc("/teachers", handlers.GetAllTeachers).Methods("GET")
+    adminRouter.HandleFunc("/teachers/list", handlers.GetAllTeachers).Methods("GET")
     adminRouter.HandleFunc("/teachers", handlers.CreateTeacher).Methods("POST")
     adminRouter.HandleFunc("/teachers/{id}", handlers.UpdateTeacher).Methods("PUT")
     adminRouter.HandleFunc("/teachers/{id}", handlers.DeleteTeacher).Methods("DELETE")
 
     // Routes pour les voeux, accessibles uniquement par l'admin
-    adminRouter.HandleFunc("/voeux", handlers.GetAllVoeux).Methods("GET")
+    adminRouter.HandleFunc("/voeux/list", handlers.GetAllVoeux).Methods("GET")
     adminRouter.HandleFunc("/voeux", handlers.CreateVoeux).Methods("POST")
     adminRouter.HandleFunc("/voeux/{id}", handlers.UpdateVoeux).Methods("PUT")
     adminRouter.HandleFunc("/voeux/{id}", handlers.DeleteVoeux).Methods("DELETE")

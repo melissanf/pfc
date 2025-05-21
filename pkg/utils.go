@@ -1,8 +1,7 @@
 package utils
 import (
 	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"log"
-	"net/http"
+	"log"	
 	"regexp"
 	"strings"
 	"time"
@@ -125,12 +124,6 @@ func GetHoursForType(module *models.Module, niveauID uint, slotType string) int 
 	return 0
 }
 
-
-
-// FormBool vérifie si une case à cocher est activée dans un formulaire
-func FormBool(r *http.Request, key string) bool {
-	return r.FormValue(key) == "on"
-}
 
 var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
 func GenerateJWT(user *models.User) (string, error) {
