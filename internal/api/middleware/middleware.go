@@ -59,7 +59,7 @@ func IsAdmin(next http.Handler) http.Handler {
         }
 
         // Vérifie si l'utilisateur est un admin
-        if claims.Role != "admin" {
+        if claims.Role != "Chef_de_Departement" {
             http.Error(w, "Accès refusé : Vous n'êtes pas autorisé", http.StatusForbidden)
             return
         }

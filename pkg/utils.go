@@ -52,7 +52,7 @@ func ValidateInput(user models.User) (bool, string) {
 }
 func sanitizeRole(role models.Role) models.Role {
 	switch role {
-	case models.Chefdep,models.Personnel, models.Enseignant:
+	case models.Chef_de_Departement,models.Personnel, models.Enseignant:
 		return models.Role(role) // Rôle valide
 	default:
 		// Retourne un rôle par défaut si le rôle est invalide
@@ -134,6 +134,7 @@ func GenerateJWT(user *models.User) (string, error) {
 		UserID:   user.ID,
 		Username: user.Nom + " " + user.Prenom,
 		Role:     user.Role,
+		Code :    user.Code ,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 24h de validité
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -201,7 +202,7 @@ func abbrevRole(role models.Role) string {
     switch role {
 	case "Enseignant":
 		return "E"
-	case "Chef de Depatement":
+	case "Chef_de_Departement":
 		 return "D"
 	case "Personnel Administratif":
 		return "P"
@@ -211,9 +212,9 @@ func abbrevRole(role models.Role) string {
 }
 
 // Fonction pour générer le code
-func generateUserCode(user *models.User) string {
+func GenerateUserCode(user *models.User) string {
     initials := strings.ToUpper(string(user.Prenom[0]) + string(user.Nom[0]))
     roleCode := abbrevRole(user.Role)
     idStr := fmt.Sprintf("%04d", user.ID) // padding avec 0 jusqu'à 4 chiffres
-    return fmt.Sprintf("%s-%s-%s", roleCode, initials, idStr)
+    return fmt.Sprintf("%s-%s-%s", roleCode, initials, idStr) 
 }

@@ -37,7 +37,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Erreur lors de la vérification", http.StatusInternalServerError)
 		return
 	}
-	if count > 4 {
+	if count > 3 {
 		http.Error(res, "Vous avez déjà soumis 3 vœux.", http.StatusForbidden)
 		return
 	}
@@ -47,7 +47,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		TP         bool   `json:"tp"`
 		TD         bool   `json:"td"`
 		Cour       bool   `json:"cour"`
-        heursupp   bool   `json:"cour"`
+        heursupp   bool   `json:"heursupp"`
 	}
 	var modules []ModuleData
 	decoder := json.NewDecoder(req.Body)
@@ -61,6 +61,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, fmt.Sprintf("donner recus vide  "), http.StatusNotFound)
 			return
 		}
+
 		priority := i+1
 		module, err := services.GetModuleByName(db, Module.ModuleName)
 		if err != nil {
@@ -81,7 +82,9 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, fmt.Sprintf("Un vœu identique existe déjà pour le module '%s' et niveau spécifié.", Module.ModuleName), http.StatusBadRequest)
 			return
 		}
-
+        if Module.heursupp{
+			priority = -1
+		}
 		voeux := &models.Voeux{
 			TeacherID: profID,
 			ModuleID:  module.ID,
@@ -91,6 +94,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			Cours:     Module.Cour,
 			Priority:  priority,
 		}
+        
 		if err := services.CreateVoeux(db, voeux); err != nil {
 			fmt.Println(err)
 			http.Error(res, "Erreur lors de l'insertion", http.StatusInternalServerError)

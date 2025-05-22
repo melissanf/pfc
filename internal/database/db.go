@@ -39,15 +39,11 @@ func InitDB() {
 		&models.ModuleNiveau{},
 	}
 	for _, model := range modelsToMigrate {
-    if !DB.Migrator().HasTable(model) {
         if err := DB.AutoMigrate(model); err != nil {
             log.Printf("⚠️ Erreur migration pour %T : %v", model, err)
         } else {
             log.Printf("✅ Table migrée : %T", model)
         }
-    } else {
-        log.Printf("📌 Table déjà existante : %T", model)
-    }
 }
 	if err != nil {
 		log.Fatal("Erreur lors de l'exécution de AutoMigrate :", err)

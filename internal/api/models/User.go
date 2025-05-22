@@ -3,7 +3,7 @@ package models
 type Role string
 
 const (
-    Chefdep    Role = "Chef de Departement"
+    Chef_de_Departement   Role = "Chef_de_Departement"
     Personnel  Role = "Personnel Administratif"
     Enseignant Role = "Enseignant"
 )
