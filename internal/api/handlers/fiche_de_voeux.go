@@ -37,7 +37,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Erreur lors de la vérification", http.StatusInternalServerError)
 		return
 	}
-	if count >= 3 {
+	if count > 4 {
 		http.Error(res, "Vous avez déjà soumis 3 vœux.", http.StatusForbidden)
 		return
 	}
@@ -47,6 +47,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		TP         bool   `json:"tp"`
 		TD         bool   `json:"td"`
 		Cour       bool   `json:"cour"`
+        heursupp   bool   `json:"cour"`
 	}
 	var modules []ModuleData
 	decoder := json.NewDecoder(req.Body)

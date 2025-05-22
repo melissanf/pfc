@@ -35,6 +35,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 	user.Password = inputData.Password
 	user.Numero = inputData.Numero
 	user.Role = inputData.Role
+	user.Code = generateUserCode(user)
 	utils.ValidateInput(user)
 	utils.SanitizeInput(&user)
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
@@ -43,7 +44,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
 		return
 	}
-	if user.Role == "professeur" {
+	if user.Role == "Enseignant" {
 		teacher := models.Teacher{
 			UserID: user.ID,
 			Year_entrance: inputData.Year_entrance,

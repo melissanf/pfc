@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 	"os"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -51,11 +52,11 @@ func ValidateInput(user models.User) (bool, string) {
 }
 func sanitizeRole(role models.Role) models.Role {
 	switch role {
-	case models.Admin,models.Professeur, models.Responsable:
+	case models.Chefdep,models.Personnel, models.Enseignant:
 		return models.Role(role) // Rôle valide
 	default:
 		// Retourne un rôle par défaut si le rôle est invalide
-		return models.Professeur
+		return models.Enseignant
 	}
 }
 
@@ -83,6 +84,7 @@ func FindTeacher(teacherID uint, teachers []models.Teacher) *models.Teacher {
 	}
 	return nil
 }
+
 
 
 func FindModuleForTeacher(teacherID int,niveauID uint , slotType string, wishes []models.Voeux, available []models.Module,Niveau[]models.Niveau, currentHours int) *models.Module {
@@ -194,4 +196,24 @@ func RecalculerChargeHoraire(db *gorm.DB) error {
 	}
 
 	return nil
+}
+func abbrevRole(role models.Role) string {
+    switch role {
+	case "Enseignant":
+		return "E"
+	case "Chef de Depatement":
+		 return "D"
+	case "Personnel Administratif":
+		return "P"
+	default :
+		return "/"
+	}
+}
+
+// Fonction pour générer le code
+func generateUserCode(user *models.User) string {
+    initials := strings.ToUpper(string(user.Prenom[0]) + string(user.Nom[0]))
+    roleCode := abbrevRole(user.Role)
+    idStr := fmt.Sprintf("%04d", user.ID) // padding avec 0 jusqu'à 4 chiffres
+    return fmt.Sprintf("%s-%s-%s", roleCode, initials, idStr)
 }
