@@ -1,0 +1,160 @@
+.dashboardtec-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fb; /* subtle background */
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 30px 40px;
+  background-color: #f9fbfc;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.welcome {
+  font-size: 30px;       /* Bigger title */
+  font-weight: 700;      /* Bold */
+  color: #0d3c91;       /* Darker blue */
+  margin: 0;
+}
+
+.welcome span {
+  color: #295bb3;
+}
+
+/* Wishlist Button */
+.wishlist-button {
+  background-color: #295bb3;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(41, 91, 179, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.wishlist-button:hover {
+  background-color: #1f3e8a;
+}
+
+/* Cards Grid */
+.cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 20px 30px; /* vertical 30px, horizontal 40px */
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Each Card */
+.card {
+  background-color: white;
+  border-radius: 14px;
+  padding: 24px 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+  transition: box-shadow 0.3s ease;
+  border: none;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card h2 {
+  font-size: 24px;    /* Bigger title */
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 22px;
+  letter-spacing: 0.03em;
+}
+
+.card-item {
+  background-color: #e6efff;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 16px;
+  color: #2a3f70;
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+/* Progress Bar */
+.progress-bar {
+  background-color: #d9d9d9;
+  height: 10px;
+  border-radius: 6px;
+  margin-top: 14px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 6px;
+  transition: width 0.5s ease-in-out;
+}
+
+/* Responsive: stack cards on small screens */
+@media (max-width: 680px) {
+  .cards-wrapper {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: 25px 0;
+  }
+  
+  .wishlist-button {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .welcome {
+    font-size: 22px;
+  }
+}
+/* Spécifique à la carte Heures de Charge */
+.card p {
+   background-color: #e6efff;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 16px;
+  color: #1b294b;
+  display: flex;
+  align-items: center;
+  
+}
+
+.card p strong {
+  font-weight: 700; /* gras pour les labels */
+  color: #1e3a8a;
+  margin-right: 6px;
+}
+
+/* Style pour le texte des valeurs */
+.card p span.value {
+  font-weight: normal;  /* valeurs en normal */
+  color: #2a3f70;
+}
