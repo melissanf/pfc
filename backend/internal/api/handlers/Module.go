@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
+	"github.com/melissanf/pfc/backend/internal/database"
+	"github.com/melissanf/pfc/backend/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/services"
 	"encoding/json"
 	"net/http"
 )
@@ -12,8 +12,9 @@ func GetAllModules(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 	var modules []models.Module
 
-	if err := db.Preload("Niveaux").Find(&modules).Error; err != nil {
-
+	if err := db.
+		Preload("ModuleNiveaux.Niveau"). // ✅ Pour charger les niveaux liés
+		Find(&modules).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

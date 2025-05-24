@@ -1,7 +1,7 @@
 package services
 import(
 	"gorm.io/gorm"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"fmt"
 	"strings"
 )

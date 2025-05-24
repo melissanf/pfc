@@ -1,7 +1,7 @@
 package services
 import (
 	"gorm.io/gorm"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	)	
 func GetModuleByName(db *gorm.DB, name string) (*models.Module, error) {
     var module models.Module

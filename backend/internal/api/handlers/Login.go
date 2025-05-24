@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
-	"github.com/ilyes-rhdi/Projet_s4/pkg"
+	"github.com/melissanf/pfc/backend/internal/database"
+	"github.com/melissanf/pfc/backend/pkg"
 	"net/http"
 	"encoding/json"
 )
@@ -15,8 +15,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	type LoginRequest struct {
-		Identifier string `json:"identifier"`
+		Identifier string `json:"email"`
 		Password   string `json:"password"`
+		code       string `json:"code"`
 	}
 
 	var reqData LoginRequest

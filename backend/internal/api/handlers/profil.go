@@ -1,56 +1,43 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/melissanf/pfc/backend/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/services"
+	"github.com/melissanf/pfc/backend/internal/database"
 	"net/http"
-	"os"
 	"encoding/json"
 	"strings"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func HandelProfile(res http.ResponseWriter, req *http.Request) {
 	authHeader := req.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-		http.Redirect(res, req, "/login", http.StatusFound)
-		return
-	}
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-	claims := &jwt.MapClaims{}
-
-	secretKey := os.Getenv("JWT_SECRET_KEY")
-	if secretKey == "" {
-		http.Error(res, "Internal server error: secret key missing", http.StatusInternalServerError)
-		return
-	}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secretKey), nil
-	})
-
-	if err != nil || !token.Valid {
-		http.Redirect(res, req, "/login", http.StatusFound)
+		http.Error(res, "Token manquant", http.StatusUnauthorized)
 		return
 	}
 
-	username, _ := (*claims)["username"].(string)
-	email, _ := (*claims)["email"].(string)
 
-	if username == "" || email == "" {
-		http.Redirect(res, req, "/login", http.StatusFound)
+	claims, ok := req.Context().Value("user").(*models.Claims)
+	if !ok {
+		http.Error(res, "Erreur de récupération des claims", http.StatusInternalServerError)
 		return
 	}
     db:=database.GetDB()
-	// Récupérer l'utilisateur à partir de l'email
-	user, err := services.GetUserByEmail(db, email) 
+	// Récupérer l'utilisateur à partir de l'id
+	user, err := services.GetUserByID(db, claims.UserID) 
 	if err != nil {
 		http.Error(res, "Utilisateur non trouvé", http.StatusNotFound)
 		return
 	}
+    type data struct{
+		Nom string 
+		Prenom string 
+		Email string 
+		Numero string 
 
+	}
 	// Utilisation des données de l'utilisateur
-	Data := models.User{
+	Data := data{
 		Nom:    user.Nom,
 		Prenom: user.Prenom,
 		Email:  user.Email,

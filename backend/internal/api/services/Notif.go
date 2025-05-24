@@ -1,6 +1,6 @@
 package services
 import(
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"gorm.io/gorm"
 	"fmt"
 )

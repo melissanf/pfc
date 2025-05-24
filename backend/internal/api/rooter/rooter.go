@@ -1,8 +1,8 @@
 package rooter
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/handlers"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/middleware"
+	"github.com/melissanf/pfc/backend/internal/api/handlers"
+	"github.com/melissanf/pfc/backend/internal/api/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -15,9 +15,10 @@ func NewRouter() *mux.Router {
 	router.HandleFunc("/logout", handlers.Logout).Methods("POST")
     router.HandleFunc("/submit", handlers.Submit).Methods("GET","POST")
     //Routes pour lmes enseignants
-    ProfRouter := router.PathPrefix("/Enseigniant").Subrouter()
+    ProfRouter := router.PathPrefix("/Enseignant").Subrouter()
     ProfRouter.HandleFunc("/profile", handlers.HandelProfile).Methods("GET")
-    ProfRouter.HandleFunc("/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("GET", "POST")
+    ProfRouter.HandleFunc("/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("POST")
+    ProfRouter.HandleFunc("/fiche-de-voeux", handlers.GetVoeuxByTeacherID).Methods("GET")
     ProfRouter.HandleFunc("/commentaire", handlers.CreateCommentaire).Methods("GET", "POST")
     ProfRouter.HandleFunc("/modules", handlers.GetAllModules).Methods("GET")
 

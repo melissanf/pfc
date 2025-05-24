@@ -1,7 +1,7 @@
 package services
 import (
 	"gorm.io/gorm"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 )
 func CreateVoeux(db *gorm.DB, voeux *models.Voeux) error {
     return db.Create(voeux).Error
@@ -24,7 +24,8 @@ func DeleteVoeux(db *gorm.DB, id uint) error {
 }
 func CountVoeuxByTeacherID(db *gorm.DB, teacherID uint) (int64, error) {
     var count int64
-    err := db.Model(&models.Voeux{}).Where("teacher_id = ?", teacherID).Count(&count).Error
+	x := -1
+    err := db.Model(&models.Voeux{}).Where("teacher_id = ? AND Priority != ?", teacherID,x).Count(&count).Error
     return count, err
 }
 func VoeuxExactExists(db *gorm.DB, teacherID, moduleID, niveauID uint, tp, td, cours bool) (bool, error) {

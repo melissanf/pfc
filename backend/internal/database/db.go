@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -37,17 +37,14 @@ func InitDB() {
 		&models.Commentaire{},
 		&models.Notif{},
 		&models.ModuleNiveau{},
+		&models.TeacherSpeciality{},
 	}
 	for _, model := range modelsToMigrate {
-    if !DB.Migrator().HasTable(model) {
         if err := DB.AutoMigrate(model); err != nil {
             log.Printf("⚠️ Erreur migration pour %T : %v", model, err)
         } else {
             log.Printf("✅ Table migrée : %T", model)
         }
-    } else {
-        log.Printf("📌 Table déjà existante : %T", model)
-    }
 }
 	if err != nil {
 		log.Fatal("Erreur lors de l'exécution de AutoMigrate :", err)

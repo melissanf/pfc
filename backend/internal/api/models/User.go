@@ -1,11 +1,10 @@
 package models
-
 type Role string
 
 const (
-    Admin      Role = "admin"
-    Professeur Role = "professeur"
-    Responsable Role = "responsable"
+    Chef_de_Departement   Role = "Chef_de_Departement"
+    Personnel  Role = "Personnel Administratif"
+    Enseignant Role = "Enseignant"
 )
 
 type User struct {
@@ -15,5 +14,6 @@ type User struct {
     Email    string `gorm:"unique;not null" json:"email"`
     Password string `gorm:"not null" json:"password"`
     Numero   string `gorm:"not null" json:"numero"`
-    Role     Role   `gorm:"type:text;default:'professeur';not null" json:"role"`
+    Code     string `gorm:"not null" json:"code"`
+    Role     Role   `gorm:"type:text;default:'Enseignant';not null" json:"role"`
 }
