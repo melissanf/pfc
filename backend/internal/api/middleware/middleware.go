@@ -1,15 +1,18 @@
 package middleware
 
 import (
-	"github.com/melissanf/pfc/backend/internal/api/models"
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 )
 
-var JwtKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
+var JwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+
 type contextKey string
 
 const userContextKey = contextKey("user")
@@ -22,7 +25,7 @@ func JwtMiddleware(next http.Handler) http.Handler {
 		}
 
 		authHeader := r.Header.Get("Authorization")
-		if authHeader == ""  {
+		if authHeader == "" {
 			http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
 			return
 		}
@@ -48,23 +51,28 @@ func JwtMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-
-
 func IsAdmin(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        claims, ok := r.Context().Value("user").(*models.Claims)
-        if !ok {
-            http.Error(w, "Erreur de récupération des claims", http.StatusInternalServerError)
-            return
-        }
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		claims, ok := r.Context().Value("user").(*models.Claims)
+		if !ok {
+			http.Error(w, "Erreur de récupération des claims", http.StatusInternalServerError)
+			return
+		}
 
-        // Vérifie si l'utilisateur est un admin
-        if claims.Role != "Chef_de_Departement" {
-            http.Error(w, "Accès refusé : Vous n'êtes pas autorisé", http.StatusForbidden)
-            return
-        }
+		// Vérifie si l'utilisateur est un admin
+		if claims.Role != "chefDepartement" {
+			http.Error(w, "Accès refusé : Vous n'êtes pas autorisé", http.StatusForbidden)
+			return
+		}
 
-        // Si l'utilisateur est admin, appelle le handler suivant
-        next.ServeHTTP(w, r)
-    })
+		// Si l'utilisateur est admin, appelle le handler suivant
+		next.ServeHTTP(w, r)
+	})
+}
+
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }

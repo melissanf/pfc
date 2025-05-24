@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"github.com/melissanf/pfc/backend/internal/database"
-	"github.com/melissanf/pfc/backend/internal/api/models"
-	"github.com/melissanf/pfc/backend/internal/api/services"
 	"encoding/json"
 	"fmt"
-	"strconv"
-	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/melissanf/pfc/backend/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/services"
+	"github.com/melissanf/pfc/backend/internal/database"
 )
 
 
@@ -47,7 +48,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		TP         bool   `json:"tp"`
 		TD         bool   `json:"td"`
 		Cour       bool   `json:"cour"`
-        heursupp   bool   `json:"hr"`
+        Heursupp   bool   `json:"hr"`
 	}
 	var modules []ModuleData
 	decoder := json.NewDecoder(req.Body)
@@ -81,7 +82,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, fmt.Sprintf("Un vœu identique existe déjà pour le module '%s' et niveau spécifié.", Module.ModuleName), http.StatusBadRequest)
 			return
 		}
-        if Module.heursupp{
+        if Module.Heursupp{
 			priority = -1
 		}
 		voeux := &models.Voeux{

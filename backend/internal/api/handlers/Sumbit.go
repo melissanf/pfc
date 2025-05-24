@@ -1,71 +1,94 @@
 package handlers
 
 import (
+	"encoding/json"
+	"net/http"
+
 	"github.com/melissanf/pfc/backend/internal/api/models"
 	"github.com/melissanf/pfc/backend/internal/api/services"
 	"github.com/melissanf/pfc/backend/internal/database"
-	"github.com/melissanf/pfc/backend/pkg"
-	"net/http"
-	"encoding/json"
-	"fmt"
+	utils "github.com/melissanf/pfc/backend/pkg"
 	"golang.org/x/crypto/bcrypt"
 )
+
 func Submit(res http.ResponseWriter, req *http.Request) {
 	db := database.GetDB()
-    var user models.User
-	type input struct{
-		Nom      string `json:"nom"`
-		Prenom   string `json:"prenom"`
-		Email    string `null" json:"email"`
-		Password string `json:"password"`
-		Numero   string `json:"numero"`
-		Role     models.Role      `"json:"role"`
-		Year_entrance int         `"json:"year_entrance"`
-        Grade         string      `"json:"grade"`
+
+	type input struct {
+		Nom      string      `json:"nom"`
+		Prenom   string      `json:"prenom"`
+		Email    string      `json:"email"`
+		Password string      `json:"password"`
+		Numero   string      `json:"numero"`
+		Role     models.Role `json:"role"`
+		Code     string      `json:"code"`
 	}
-    var inputData input
+	var inputData input
 
 	err := json.NewDecoder(req.Body).Decode(&inputData)
 	if err != nil {
 		http.Error(res, "Données invalides", http.StatusBadRequest)
 		return
 	}
+	ok, err := utils.Ismatch(db, inputData.Role, inputData.Code)
+	if err != nil {
+		http.Error(res, "Erreur lors de la vérification du code", http.StatusInternalServerError)
+		return
+	}
+	if !ok {
+		http.Error(res, "Le code ne correspond pas au rôle sélectionné", http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
 	user.Nom = inputData.Nom
 	user.Prenom = inputData.Prenom
 	user.Email = inputData.Email
 	user.Password = inputData.Password
 	user.Numero = inputData.Numero
 	user.Role = inputData.Role
+	user.Code = inputData.Code
+
 	utils.ValidateInput(user)
 	utils.SanitizeInput(&user)
+
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	user.Password = string(hashedPassword[:])
+	user.Password = string(hashedPassword)
+
 	if err := services.CreateUser(db, &user); err != nil {
-		http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
+		http.Error(res, "Échec de l'insertion de l'utilisateur dans la base de données", http.StatusInternalServerError)
 		return
 	}
-	user.Code = utils.GenerateUserCode(&user)
-	db.Save(&user)
-	if user.Role == "Enseignant" {
+
+	if user.Role == "enseignant" {
 		teacher := models.Teacher{
-			UserID: user.ID,
-			Year_entrance: inputData.Year_entrance,
-			Grade: inputData.Grade,
+			UserID:        user.ID,
 			ChargeHoraire: 0,
-			Heursupp: 0,
-		};
+			Heursupp:      0,
+		}
 		if err := services.CreateTeacher(db, &teacher); err != nil {
 			http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
 			return
 		}
 	}
-     
 
 	token, err := utils.GenerateJWT(&user)
 	if err != nil {
 		http.Error(res, "Erreur lors de la génération du token", http.StatusInternalServerError)
 		return
 	}
-	res.Header().Set("Authorization", "Bearer "+token)
-	fmt.Fprintf(res, "Votre code est : %s", user.Code)
+
+	res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(http.StatusCreated)
+	json.NewEncoder(res).Encode(map[string]interface{}{
+		"token": token,
+		"user": map[string]interface{}{
+			"nom":    user.Nom,
+			"prenom": user.Prenom,
+			"email":  user.Email,
+			"numero": user.Numero,
+			"role":   user.Role,
+			"code":   user.Code,
+		},
+	})
 }

@@ -181,6 +181,7 @@ func ResolveConflit(db *gorm.DB, candidats []models.Voeux, moduleSpeciality stri
 
 	return &scored[0].Voeu, nil
 }
+
 func TeacherHasSpeciality(db *gorm.DB, teacher models.Teacher, specialityName string) (bool, error) {
 	var count int64
 

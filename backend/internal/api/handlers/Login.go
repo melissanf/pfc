@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"github.com/melissanf/pfc/backend/internal/database"
-	"github.com/melissanf/pfc/backend/pkg"
-	"net/http"
 	"encoding/json"
+	"net/http"
+
+	"github.com/melissanf/pfc/backend/internal/database"
+	utils "github.com/melissanf/pfc/backend/pkg"
 )
-
-
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
@@ -17,7 +16,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	type LoginRequest struct {
 		Identifier string `json:"email"`
 		Password   string `json:"password"`
-		code       string `json:"code"`
+		Code       string `json:"code"`
 	}
 
 	var reqData LoginRequest
@@ -29,7 +28,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 
 	// Authentifie l'utilisateur
-	verified, user, message := utils.VerifyUser(db,reqData.Identifier, reqData.Password)
+	verified, user, message := utils.VerifyUser(db, reqData.Identifier, reqData.Password)
 	if !verified {
 		http.Error(w, message, http.StatusUnauthorized)
 		return

@@ -3,8 +3,8 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 // Pages d'authentification
-import Signup from "./signup/signup";
-import LoginPage from "./login/login";
+import Signup from "./components/signup/signup";
+import LoginPage from "./components/login/login";
 
 // Pages principales
 import Parametre from "./pages/Parametre";

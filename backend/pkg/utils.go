@@ -1,13 +1,15 @@
 package utils
+
 import (
-	"github.com/melissanf/pfc/backend/internal/api/models"
-	"log"	
+	"fmt"
+	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
-	"os"
-	"fmt"
+
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -16,6 +18,7 @@ type Pagedata struct {
 	Currentuser models.User
 	Users       []models.User
 }
+
 func VerifyUser(db *gorm.DB, identifier, password string) (bool, models.User, string) {
 	var user models.User
 	if err := db.Where("email = ?", identifier).First(&user).Error; err != nil {
@@ -44,7 +47,7 @@ func ValidateInput(user models.User) (bool, string) {
 	if len(user.Password) < 6 {
 		return false, "Password must be at least 6 characters long."
 	}
-	if len(user.Numero) != 10  || user.Numero[0] != '0' {
+	if len(user.Numero) != 10 || user.Numero[0] != '0' {
 		return false, "Phone number must be 10 digits long."
 	}
 
@@ -52,7 +55,7 @@ func ValidateInput(user models.User) (bool, string) {
 }
 func sanitizeRole(role models.Role) models.Role {
 	switch role {
-	case models.Chef_de_Departement,models.Personnel, models.Enseignant:
+	case models.ChefDepartement, models.Personnel, models.Enseignant:
 		return models.Role(role) // Rôle valide
 	default:
 		// Retourne un rôle par défaut si le rôle est invalide
@@ -85,28 +88,27 @@ func FindTeacher(teacherID uint, teachers []models.Teacher) *models.Teacher {
 	return nil
 }
 
+func FindModuleForTeacher(teacherID int, niveauID uint, slotType string, wishes []models.Voeux, available []models.Module, Niveau []models.Niveau, currentHours int) *models.Module {
+	for prio := 1; prio <= 3; prio++ {
+		for _, v := range wishes {
+			if int(v.TeacherID) == teacherID && v.Priority == prio && v.NiveauID == niveauID {
+				if (slotType == "cours" && v.Cours) ||
+					(slotType == "td" && v.Td) ||
+					(slotType == "tp" && v.Tp) {
 
-func FindModuleForTeacher(teacherID int,niveauID uint , slotType string, wishes []models.Voeux, available []models.Module,Niveau[]models.Niveau, currentHours int) *models.Module {
-    for prio := 1; prio <= 3; prio++ {
-        for _, v := range wishes {
-            if int(v.TeacherID) == teacherID && v.Priority == prio && v.NiveauID == niveauID {
-                if (slotType == "cours" && v.Cours) ||
-                   (slotType == "td" && v.Td) ||
-                   (slotType == "tp" && v.Tp) {
-                    
-                    for _, module := range available {
-                        if module.ID == v.ModuleID {
-                            hours := GetHoursForType(&module, niveauID, slotType)
-                            if hours > 0 && currentHours+hours <= 24 {
-                                return &module
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return nil
+					for _, module := range available {
+						if module.ID == v.ModuleID {
+							hours := GetHoursForType(&module, niveauID, slotType)
+							if hours > 0 && currentHours+hours <= 24 {
+								return &module
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func GetHoursForType(module *models.Module, niveauID uint, slotType string) int {
@@ -125,15 +127,15 @@ func GetHoursForType(module *models.Module, niveauID uint, slotType string) int 
 	return 0
 }
 
+var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY")) 
 func GenerateJWT(user *models.User) (string, error) {
 	// Crée les claims avec la date d’expiration
 	claims := models.Claims{
 		UserID:   user.ID,
 		Username: user.Nom + " " + user.Prenom,
 		Role:     user.Role,
-		Code :    user.Code ,
+		Code:     user.Code,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 24h de validité
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -198,22 +200,62 @@ func RecalculerChargeHoraire(db *gorm.DB) error {
 	return nil
 }
 func abbrevRole(role models.Role) string {
-    switch role {
+	switch role {
 	case "Enseignant":
 		return "E"
-	case "Chef_de_Departement":
-		 return "D"
+	case "chefDepartement":
+		return "D"
 	case "Personnel Administratif":
 		return "P"
-	default :
+	default:
 		return "/"
 	}
 }
 
 // Fonction pour générer le code
 func GenerateUserCode(user *models.User) string {
-    initials := strings.ToUpper(string(user.Prenom[0]) + string(user.Nom[0]))
-    roleCode := abbrevRole(user.Role)
-    idStr := fmt.Sprintf("%04d", user.ID) // padding avec 0 jusqu'à 4 chiffres
-    return fmt.Sprintf("%s-%s-%s", roleCode, initials, idStr) 
+	initials := strings.ToUpper(string(user.Prenom[0]) + string(user.Nom[0]))
+	roleCode := abbrevRole(user.Role)
+	idStr := fmt.Sprintf("%04d", user.ID) // padding avec 0 jusqu'à 4 chiffres
+	return fmt.Sprintf("%s-%s-%s", roleCode, initials, idStr)
+}
+
+func IsCodeExists(db *gorm.DB, code string) (bool, error) {
+	var count int64
+	err := db.Model(&models.UserCode{}).
+		Where("code = ? AND (user_id IS NULL OR user_id = 0)", code).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func Ismatch(db *gorm.DB, role models.Role, code string) (bool, error) {
+	ok, err := IsCodeExists(db, code)
+	if err != nil {
+		return false, err // si une erreur de requête arrive, on la retourne
+	}
+	if !ok {
+		return false, nil // le code n'existe pas
+	}
+
+	switch role {
+	case "Enseignant":
+		if code[0] != 'E' {
+			return false, nil
+		}
+	case "chefDepartement":
+		if code[0] != 'D' {
+			return false, nil
+		}
+	case "staffAdministrateur":
+		if code[0] != 'P' {
+			return false, nil
+		}
+	default:
+		return false, nil
+	}
+
+	return true, nil
 }

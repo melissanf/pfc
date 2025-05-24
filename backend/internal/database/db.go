@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"github.com/melissanf/pfc/backend/internal/api/models"
+
 	"github.com/joho/godotenv"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
+
 func InitDB() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -27,7 +29,7 @@ func InitDB() {
 		log.Fatal("Erreur de connexion à la base de données :", err)
 	}
 
-	modelsToMigrate := []interface{}{ 
+	modelsToMigrate := []interface{}{
 		&models.User{},
 		&models.Teacher{},
 		&models.Module{},
@@ -38,14 +40,15 @@ func InitDB() {
 		&models.Notif{},
 		&models.ModuleNiveau{},
 		&models.TeacherSpeciality{},
+		&models.UserCode{},
 	}
 	for _, model := range modelsToMigrate {
-        if err := DB.AutoMigrate(model); err != nil {
-            log.Printf("⚠️ Erreur migration pour %T : %v", model, err)
-        } else {
-            log.Printf("✅ Table migrée : %T", model)
-        }
-}
+		if err := DB.AutoMigrate(model); err != nil {
+			log.Printf("⚠️ Erreur migration pour %T : %v", model, err)
+		} else {
+			log.Printf("✅ Table migrée : %T", model)
+		}
+	}
 	if err != nil {
 		log.Fatal("Erreur lors de l'exécution de AutoMigrate :", err)
 	}
