@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -37,6 +37,7 @@ func InitDB() {
 		&models.Commentaire{},
 		&models.Notif{},
 		&models.ModuleNiveau{},
+		&models.TeacherSpeciality{},
 	}
 	for _, model := range modelsToMigrate {
         if err := DB.AutoMigrate(model); err != nil {

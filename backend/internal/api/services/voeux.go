@@ -1,7 +1,7 @@
 package services
 import (
 	"gorm.io/gorm"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 )
 func CreateVoeux(db *gorm.DB, voeux *models.Voeux) error {
     return db.Create(voeux).Error

@@ -1,5 +1,4 @@
 package models
-
 type Role string
 
 const (

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
+	"github.com/melissanf/pfc/backend/internal/database"
+	"github.com/melissanf/pfc/backend/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/services"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -47,7 +47,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		TP         bool   `json:"tp"`
 		TD         bool   `json:"td"`
 		Cour       bool   `json:"cour"`
-        heursupp   bool   `json:"heursupp"`
+        heursupp   bool   `json:"hr"`
 	}
 	var modules []ModuleData
 	decoder := json.NewDecoder(req.Body)
@@ -107,6 +107,7 @@ func Fiche_de_voeux(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
 		return
 	}
+
 }
 func GetAllVoeux(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
@@ -134,6 +135,41 @@ func GetVoeuxByID(w http.ResponseWriter, r *http.Request) {
 	if err:=json.NewEncoder(w).Encode(voeux); err!=nil {	
 		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
 		return
+	}
+}
+
+func GetVoeuxByTeacherID(w http.ResponseWriter, r *http.Request) {
+	db := database.GetDB()
+
+	// Récupération des claims (authentification)
+	claims, ok := r.Context().Value("user").(*models.Claims)
+	if !ok || claims == nil {
+		http.Error(w, "Utilisateur non authentifié", http.StatusUnauthorized)
+		return
+	}
+
+	// Récupération de l'objet Teacher lié à l'utilisateur connecté
+	teacher, err := services.GetTeacherByUserID(db, claims.UserID)
+	if err != nil {
+		http.Error(w, "Professeur introuvable", http.StatusNotFound)
+		return
+	}
+
+	// Récupération des vœux liés à ce professeur
+	var voeux []models.Voeux
+	if err := db.Preload("Teacher.User").
+		Preload("Module").
+		Preload("Niveau").
+		Where("teacher_id = ?", teacher.ID).
+		Find(&voeux).Error; err != nil || len(voeux) == 0 {
+		http.Error(w, "Aucun vœu trouvé pour ce professeur", http.StatusNotFound)
+		return
+	}
+
+	// Envoi de la réponse JSON
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(voeux); err != nil {
+		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
 	}
 }
 

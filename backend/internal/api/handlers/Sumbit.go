@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/services"
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
-	"github.com/ilyes-rhdi/Projet_s4/pkg"
+	"github.com/melissanf/pfc/backend/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/services"
+	"github.com/melissanf/pfc/backend/internal/database"
+	"github.com/melissanf/pfc/backend/pkg"
 	"net/http"
 	"encoding/json"
 	"fmt"

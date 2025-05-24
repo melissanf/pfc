@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/api/models"
 	"context"
 	"net/http"
 	"os"

@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/ilyes-rhdi/Projet_s4/internal/api/models"
-	"github.com/ilyes-rhdi/Projet_s4/internal/database"
+	"github.com/melissanf/pfc/backend/internal/api/models"
+	"github.com/melissanf/pfc/backend/internal/database"
 	"encoding/json"
 	"net/http"
 	"strconv"
