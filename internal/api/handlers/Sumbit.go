@@ -7,6 +7,7 @@ import (
 	"github.com/ilyes-rhdi/Projet_s4/pkg"
 	"net/http"
 	"encoding/json"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 )
 func Submit(res http.ResponseWriter, req *http.Request) {
@@ -18,7 +19,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		Email    string `null" json:"email"`
 		Password string `json:"password"`
 		Numero   string `json:"numero"`
-		Role     models.Role  `"json:"role"`
+		Role     models.Role      `"json:"role"`
 		Year_entrance int         `"json:"year_entrance"`
         Grade         string      `"json:"grade"`
 	}
@@ -43,7 +44,9 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Failed to insert user into database", http.StatusInternalServerError)
 		return
 	}
-	if user.Role == "professeur" {
+	user.Code = utils.GenerateUserCode(&user)
+	db.Save(&user)
+	if user.Role == "Enseignant" {
 		teacher := models.Teacher{
 			UserID: user.ID,
 			Year_entrance: inputData.Year_entrance,
@@ -56,7 +59,7 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
-
+     
 
 	token, err := utils.GenerateJWT(&user)
 	if err != nil {
@@ -64,4 +67,5 @@ func Submit(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	res.Header().Set("Authorization", "Bearer "+token)
+	fmt.Fprintf(res, "Votre code est : %s", user.Code)
 }

@@ -12,8 +12,9 @@ func GetAllModules(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 	var modules []models.Module
 
-	if err := db.Preload("Niveaux").Find(&modules).Error; err != nil {
-
+	if err := db.
+		Preload("ModuleNiveaux.Niveau"). // ✅ Pour charger les niveaux liés
+		Find(&modules).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -23,6 +24,7 @@ func GetAllModules(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur lors de l'envoi des données", http.StatusInternalServerError)
 	}
 }
+
 func Createmodule(w http.ResponseWriter, r *http.Request) {
 	var module models.Module
 	if err := json.NewDecoder(r.Body).Decode(&module); err != nil {

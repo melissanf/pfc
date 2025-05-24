@@ -17,6 +17,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	type LoginRequest struct {
 		Identifier string `json:"identifier"`
 		Password   string `json:"password"`
+		code       string `json:"code"`
 	}
 
 	var reqData LoginRequest
