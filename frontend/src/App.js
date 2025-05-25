@@ -35,12 +35,24 @@ const App = () => {
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("userRole") || "chef departement";
-    setRole(storedRole);
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      const user = JSON.parse(userString);
+      const role = user.role;
+      setRole(role);
+    } else {
+      console.warn("Aucun utilisateur trouvé dans le local storage.");
+    }
   }, []);
 
   const handleRoleChange = (newRole) => {
-    localStorage.setItem("userRole", newRole);
+    const userString = localStorage.getItem("user");
+    console.log("userString");
+    if (userString) {
+      const user = JSON.parse(userString);
+      user.role = newRole;
+      localStorage.setItem("user", JSON.stringify(user));
+    }
     setRole(newRole);
   };
 
@@ -97,7 +109,7 @@ const App = () => {
         <Route
           path="/commentaires"
           element={
-            role != "chef departement" ? (
+            role != "chefDepartement" ? (
               <PageWrapper>
                 <Commentaires />
               </PageWrapper>

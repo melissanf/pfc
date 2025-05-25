@@ -5,63 +5,23 @@ import { motion } from "framer-motion";
 import "./login.css";
 import logo from "../../assets/eduorg.logo.png";
 import illustration from "../../assets/Design sans titre (1).png";
-import PopupConfirm from "../PopupConfirm";
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState(null);
+  const [code, setCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [pendingUserData, setPendingUserData] = useState(null);
-
-  const fakeUsersDB = {
-    "chef@example.com": { password: "1234", role: "chef departement" },
-    "staff@example.com": { password: "1234", role: "staff administrateur" },
-    "enseignant@example.com": { password: "1234", role: "enseignant" },
-  };
-
-  const roleCodes = {
-    "chef departement": "1234",
-    "staff administrateur": "1111",
-    enseignant: "0000",
-  };
-
-  const roleOptions = [
-    { value: "chef departement", label: "Chef de département" },
-    { value: "staff administrateur", label: "Staff administrateur" },
-    { value: "enseignant", label: "Enseignant" },
-  ];
-
-  const customSelectStyles = {
-    control: (base) => ({
-      ...base,
-      borderRadius: "8px",
-      borderColor: "#0056b3",
-      padding: "5px",
-      boxShadow: "none",
-      "&:hover": { borderColor: "#0056b3" },
-      fontFamily: "Raleway, sans-serif",
-      fontSize: "0.9rem",
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused ? "#0056b3" : "white",
-      color: state.isFocused ? "white" : "black",
-      cursor: "pointer",
-      fontFamily: "Raleway, sans-serif",
-    }),
-  };
-
-  const handleSignupClick = () => {
-    navigate("/signup");
-  };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+
+    if (!code) {
+      setErrorMessage("Veuillez entrer le code.");
+      return;
+    }
 
     try {
       const backendUrl =
@@ -75,44 +35,34 @@ export default function LoginPage() {
         body: JSON.stringify({
           email,
           password,
+          code,
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
         setErrorMessage(
-          data.message || "Email, mot de passe ou rôle invalide."
+          data.message || "Email, mot de passe ou code invalide."
         );
         return;
       }
 
-      const expectedCode = roleCodes[selectedRole.value];
+      const data = await response.json();
+      const token = data.token;
 
-      setPendingUserData({
-        email,
-        role: selectedRole.value,
-        expectedCode,
-      });
+      if (!token) {
+        setErrorMessage("Erreur lors de la connexion. Token manquant.");
+        return;
+      }
 
-      setShowConfirmation(true);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      navigate("/modules");
     } catch (error) {
       setErrorMessage("Erreur de connexion. Veuillez réessayer.");
       console.error("Login error:", error);
     }
-  };
-
-  const handleCodeConfirmed = () => {
-    if (pendingUserData) {
-      localStorage.setItem("userRole", pendingUserData.role);
-      localStorage.setItem("userEmail", pendingUserData.email);
-      setShowConfirmation(false);
-      navigate("/modules");
-    }
-  };
-
-  const handleCodeFailed = () => {
-    setErrorMessage("Code incorrect. Veuillez réessayer.");
   };
 
   return (
@@ -139,7 +89,15 @@ export default function LoginPage() {
             )}
 
             <div className="form-group">
-              <label htmlFor="email" className="form-label">
+              <label
+                htmlFor="email"
+                className="form-label"
+                style={{
+                  fontSize: "0.8rem",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
                 Adresse email
               </label>
               <input
@@ -154,7 +112,15 @@ export default function LoginPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password" className="form-label">
+              <label
+                htmlFor="password"
+                className="form-label"
+                style={{
+                  fontSize: "0.8rem",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
                 Mot de passe
               </label>
               <input
@@ -165,6 +131,29 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label
+                htmlFor="code"
+                className="form-label"
+                style={{
+                  fontSize: "0.8rem",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
+                Code
+              </label>
+              <input
+                type="text"
+                id="code"
+                placeholder="Entrer le code"
+                className="form-input"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
               />
             </div>
 
@@ -180,7 +169,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="signup-button"
-                onClick={handleSignupClick}
+                onClick={() => navigate("/signup")}
               >
                 S'inscrire
               </button>
@@ -196,16 +185,6 @@ export default function LoginPage() {
           />
         </div>
       </motion.div>
-
-      {showConfirmation && pendingUserData && (
-        <PopupConfirm
-          expectedCode={pendingUserData.expectedCode}
-          role={pendingUserData.role}
-          onSuccess={handleCodeConfirmed}
-          onFailure={handleCodeFailed}
-          onClose={() => setShowConfirmation(false)}
-        />
-      )}
     </PageWrapper>
   );
 }

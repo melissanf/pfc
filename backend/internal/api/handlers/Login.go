@@ -38,5 +38,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur lors de la création du token", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Authorization", "Bearer "+token)
+
+	response := map[string]interface{}{
+		"token": token,
+		"user":  user,
+	}
+	json.NewEncoder(w).Encode(response)
 }

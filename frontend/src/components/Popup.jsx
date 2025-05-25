@@ -132,6 +132,7 @@ const Popup = ({ data, onSave, onClose, isAdding }) => {
                   ...styles.input,
                   ...(isFormValid ? {} : styles.inputError),
                 }}
+                required
               />
             </div>
           ))}

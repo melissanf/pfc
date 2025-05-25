@@ -241,7 +241,7 @@ func Ismatch(db *gorm.DB, role models.Role, code string) (bool, error) {
 	}
 
 	switch role {
-	case "Enseignant":
+	case "enseignant":
 		if code[0] != 'E' {
 			return false, nil
 		}

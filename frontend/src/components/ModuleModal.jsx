@@ -133,6 +133,7 @@ const ModuleModal = ({ data, onSave, onClose, isAdding }) => {
                   value={updatedData[field.name] || ""}
                   onChange={handleChange}
                   style={styles.dropdown}
+                  required
                 >
                   <option value="">Sélectionner</option>
                   {field.options.map((option, idx) => (
@@ -151,6 +152,7 @@ const ModuleModal = ({ data, onSave, onClose, isAdding }) => {
                     ...styles.input,
                     ...(isFormValid ? {} : styles.inputError),
                   }}
+                  required
                 />
               )}
             </div>

@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import './Dashboardorga.css';
-import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import organigrammeS1Data from '../data/OrganigrammeS1.json';
+import React, { useEffect, useState } from "react";
+import "./Dashboardorga.css";
+import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import organigrammeS1Data from "../data/OrganigrammeS1.json";
 import {
   FaChalkboardTeacher,
   FaBookOpen,
   FaGraduationCap,
   FaExclamationTriangle,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
 import {
   BarChart,
@@ -17,7 +17,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
 const Dashboardorga = ({ userRole }) => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const Dashboardorga = ({ userRole }) => {
     specialites: 0,
   });
 
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertMessage, setAlertMessage] = useState("");
   const [miniTableData, setMiniTableData] = useState([]);
 
   useEffect(() => {
@@ -37,20 +37,21 @@ const Dashboardorga = ({ userRole }) => {
       modules: 12,
       specialites: 3,
     };
-    const storedStats = JSON.parse(localStorage.getItem('stats'));
+    const storedStats = JSON.parse(localStorage.getItem("stats"));
     if (storedStats) {
       setStats(storedStats);
     } else {
-      localStorage.setItem('stats', JSON.stringify(defaultStats));
+      localStorage.setItem("stats", JSON.stringify(defaultStats));
       setStats(defaultStats);
     }
 
-    const storedAlert = localStorage.getItem('alertMessage');
+    const storedAlert = localStorage.getItem("alertMessage");
     if (storedAlert) {
       setAlertMessage(storedAlert);
     } else {
-      const defaultAlert = "CERTAINES HEURES D'ENSEIGNEMENT EXCÉDENTAIRES ONT ÉTÉ DÉTECTÉES";
-      localStorage.setItem('alertMessage', defaultAlert);
+      const defaultAlert =
+        "CERTAINES HEURES D'ENSEIGNEMENT EXCÉDENTAIRES ONT ÉTÉ DÉTECTÉES";
+      localStorage.setItem("alertMessage", defaultAlert);
       setAlertMessage(defaultAlert);
     }
 
@@ -60,19 +61,19 @@ const Dashboardorga = ({ userRole }) => {
   // Données pour le graphique à barres (exemple simple)
   // Tu peux ajuster avec des données plus précises depuis localStorage ou API
   const graphData = [
-    { name: 'Enseignants', value: Number(stats.enseignants) },
-    { name: 'Modules', value: Number(stats.modules) },
-    { name: 'Spécialités', value: Number(stats.specialites) },
+    { name: "Enseignants", value: Number(stats.enseignants) },
+    { name: "Modules", value: Number(stats.modules) },
+    { name: "Spécialités", value: Number(stats.specialites) },
   ];
 
   const handleGoToOrganigramme = () => {
-    navigate('/organigramme');
+    navigate("/organigramme");
   };
   const handleGoToModules = () => {
-    navigate('/modules');
+    navigate("/modules");
   };
   const handleGoToEnseignants = () => {
-    navigate('/enseignants');
+    navigate("/enseignants");
   };
 
   return (
@@ -83,14 +84,22 @@ const Dashboardorga = ({ userRole }) => {
           <h1 className="welcome">Bienvenue sur votre tableau de bord</h1>
         </div>
 
-        {alertMessage && (
-          <div className="alert-message" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '30px' }}>
+        {alertMessage && userRole == "enseignant" && (
+          <div
+            className="alert-message"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginBottom: "30px",
+            }}
+          >
             <FaExclamationTriangle />
             <strong>Problème détecté :</strong> {alertMessage}
             <button
               className="orga-action-btn"
-              onClick={() => navigate('/alerts')}
-              style={{ marginLeft: 'auto' }}
+              onClick={() => navigate("/alerts")}
+              style={{ marginLeft: "auto" }}
             >
               Voir les alertes
             </button>
@@ -101,30 +110,27 @@ const Dashboardorga = ({ userRole }) => {
           <div
             className="mini-organigramme-box"
             onClick={handleGoToOrganigramme}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: "pointer" }}
           >
             <h3 className="mini-title">Aperçu Organigramme S1</h3>
 
             <div className="mini-table-container">
               <table className="mini-table">
                 <thead>
-                  <tr>
-                    <th>Section</th>
-                    <th>Module</th>
-                    <th>Cours</th>
-                    <th>TD1</th>
-                  </tr>
+                  <tr></tr>
                 </thead>
                 <tbody>
                   {miniTableData.length === 0 ? (
-                    <tr><td colSpan="4">Chargement...</td></tr>
+                    <tr>
+                      <td colSpan="4">Chargement...</td>
+                    </tr>
                   ) : (
                     miniTableData.map((ligne, index) => (
                       <tr key={index}>
                         <td>{ligne.Section}</td>
                         <td>{ligne.Module}</td>
                         <td>{ligne.Cours}</td>
-                        <td>{ligne.TD1 || '-'}</td>
+                        <td>{ligne.TD1 || "-"}</td>
                       </tr>
                     ))
                   )}
@@ -138,14 +144,22 @@ const Dashboardorga = ({ userRole }) => {
           </div>
 
           <div className="cards-wrapper">
-            <div className="card" onClick={handleGoToEnseignants} style={{ cursor: 'pointer' }}>
+            <div
+              className="card"
+              onClick={handleGoToEnseignants}
+              style={{ cursor: "pointer" }}
+            >
               <h2>
                 <FaChalkboardTeacher />
                 Total d’Enseignants
               </h2>
               <p>{stats.enseignants}</p>
             </div>
-            <div className="card" onClick={handleGoToModules} style={{ cursor: 'pointer' }}>
+            <div
+              className="card"
+              onClick={handleGoToModules}
+              style={{ cursor: "pointer" }}
+            >
               <h2>
                 <FaBookOpen />
                 Modules
@@ -160,9 +174,9 @@ const Dashboardorga = ({ userRole }) => {
               <p>{stats.specialites}</p>
             </div>
             {/* Carte Statistiques avec graphique */}
-            <div className="card" style={{ cursor: 'default' }}>
+            <div className="card" style={{ cursor: "default" }}>
               <h2>Statistiques Visuelles</h2>
-              <div style={{ width: '100%', height: 150 }}>
+              <div style={{ width: "100%", height: 150 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={graphData}
@@ -179,7 +193,6 @@ const Dashboardorga = ({ userRole }) => {
             </div>
           </div>
         </div>
-
       </main>
     </div>
   );

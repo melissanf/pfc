@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import './Sidebar.css'; // tu peux fusionner les styles SidebarTeacher.css et Sidebar.css dans ce fichier
-import logo from '../assets/eduorg.logo.png';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./Sidebar.css"; // tu peux fusionner les styles SidebarTeacher.css et Sidebar.css dans ce fichier
+import logo from "../assets/eduorg.logo.png";
 import {
   FiLayout,
   FiUser,
@@ -11,21 +11,27 @@ import {
   FiLogOut,
   FiMessageSquare,
   FiSettings,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
-    const role = localStorage.getItem('userRole') || 'enseignant';
-    setUserRole(role);
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      const user = JSON.parse(userString);
+      const role = user.role;
+      setUserRole(role);
+    } else {
+      console.warn("Aucun utilisateur trouvé dans le local storage.");
+    }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    navigate('/login');
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   const handleNavigate = (path) => {
@@ -41,57 +47,73 @@ const Sidebar = () => {
       </div>
 
       <div className="role-display">
-        <strong>{userRole}</strong>
+        <strong>
+          {userRole === "chefDepartement"
+            ? "Chef Department"
+            : userRole === "staffAdministrateur"
+            ? "Staff Administrator"
+            : userRole === "enseignant"
+            ? "Enseignant"
+            : userRole === "someOtherRole"
+            ? "Some Other Role"
+            : "Unknown Role"}
+        </strong>
       </div>
 
       <nav className="menu">
         {/* Menu commun */}
-        {userRole === 'enseignant' && (
+        {userRole === "enseignant" && (
           <>
             <div
-              className={`menu-item ${isActive('/dashboardtec') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/dashboardtec')}
+              className={`menu-item ${
+                isActive("/dashboardtec") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/dashboardtec")}
             >
               <FiLayout size={18} />
               <span>Tableau de bord</span>
             </div>
 
             <div
-              className={`menu-item ${isActive('/profil') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/profil')}
+              className={`menu-item ${isActive("/profil") ? "active" : ""}`}
+              onClick={() => handleNavigate("/profil")}
             >
               <FiUser size={18} />
               <span>Profil</span>
             </div>
 
             <div
-              className={`menu-item ${isActive('/modules') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/modules')}
+              className={`menu-item ${isActive("/modules") ? "active" : ""}`}
+              onClick={() => handleNavigate("/modules")}
             >
               <FiBookOpen size={18} />
               <span>Modules</span>
             </div>
 
             <div
-              className={`menu-item ${isActive('/alerts') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/alerts')}
+              className={`menu-item ${isActive("/alerts") ? "active" : ""}`}
+              onClick={() => handleNavigate("/alerts")}
             >
               <FiBell size={18} />
               <span>Alertes</span>
             </div>
 
-            {userRole === 'chef departement' && (
+            {userRole === "chef departement" && (
               <>
                 <div
-                  className={`menu-item ${isActive('/commentaires') ? 'active' : ''}`}
-                  onClick={() => handleNavigate('/commentaires')}
+                  className={`menu-item ${
+                    isActive("/commentaires") ? "active" : ""
+                  }`}
+                  onClick={() => handleNavigate("/commentaires")}
                 >
                   <FiMessageSquare size={18} />
                   <span>Commentaires</span>
                 </div>
                 <div
-                  className={`menu-item ${isActive('/parametre') ? 'active' : ''}`}
-                  onClick={() => handleNavigate('/parametre')}
+                  className={`menu-item ${
+                    isActive("/parametre") ? "active" : ""
+                  }`}
+                  onClick={() => handleNavigate("/parametre")}
                 >
                   <FiSettings size={18} />
                   <span>Paramètres</span>
@@ -101,60 +123,70 @@ const Sidebar = () => {
           </>
         )}
 
-        {(userRole === 'chef departement' || userRole === 'staff administrateur') && (
+        {(userRole === "chefDepartement" ||
+          userRole === "staffAdministrateur") && (
           <>
             <div
-              className={`menu-item ${isActive('/dashboardorga') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/dashboardorga')}
+              className={`menu-item ${
+                isActive("/dashboardorga") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/dashboardorga")}
             >
               <FiLayout size={18} />
               <span>Tableau de bord</span>
             </div>
 
             <div
-              className={`menu-item ${isActive('/enseignants') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/enseignants')}
+              className={`menu-item ${
+                isActive("/enseignants") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/enseignants")}
             >
               <FiUser size={18} />
               <span>Enseignants</span>
             </div>
 
             <div
-              className={`menu-item ${isActive('/modules') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/modules')}
+              className={`menu-item ${isActive("/modules") ? "active" : ""}`}
+              onClick={() => handleNavigate("/modules")}
             >
               <FiBookOpen size={18} />
               <span>Modules</span>
             </div>
 
             <div
-              className={`menu-item ${isActive('/organigramme') ? 'active' : ''}`}
-              onClick={() => handleNavigate('/organigramme')}
+              className={`menu-item ${
+                isActive("/organigramme") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/organigramme")}
             >
               <FiUsers size={18} />
               <span>Organigramme</span>
             </div>
 
-            {userRole === 'chef departement' && (
+            {userRole === "chefDepartement" && (
               <div
-                className={`menu-item ${isActive('/commentaires') ? 'active' : ''}`}
-                onClick={() => handleNavigate('/commentaires')}
+                className={`menu-item ${
+                  isActive("/commentaires") ? "active" : ""
+                }`}
+                onClick={() => handleNavigate("/commentaires")}
               >
                 <FiMessageSquare size={18} />
                 <span>Commentaires</span>
               </div>
             )}
 
-          {userRole === 'chef departement' && (
-  <div
-    className={`menu-item ${isActive('/parametre') ? 'active' : ''}`}
-    onClick={() => handleNavigate('/parametre')}
-  >
-    <FiSettings size={18} />
-    <span>Paramètres</span>
-  </div>
-)}
-
+            {userRole === "chefDepartement" && (
+              <div
+                className={`menu-item ${
+                  isActive("/parametre") ? "active" : ""
+                }`}
+                onClick={() => handleNavigate("/parametre")}
+              >
+                <FiSettings size={18} />
+                <span>Paramètres</span>
+              </div>
+            )}
           </>
         )}
       </nav>

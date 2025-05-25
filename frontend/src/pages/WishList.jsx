@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './WishList.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./WishList.css";
+import { FaArrowLeft, FaSave, FaPlus } from "react-icons/fa";
 
 const TeachingTypeSelector = ({ selectedTypes = [], onChange }) => {
-  const types = ['Cours', 'TD', 'TP'];
+  const types = ["Cours", "TD", "TP"];
 
   const toggleType = (type) => {
     if (selectedTypes.includes(type)) {
-      onChange(selectedTypes.filter(t => t !== type));
+      onChange(selectedTypes.filter((t) => t !== type));
     } else {
       onChange([...selectedTypes, type]);
     }
@@ -20,7 +21,9 @@ const TeachingTypeSelector = ({ selectedTypes = [], onChange }) => {
         {types.map((type) => (
           <button
             key={type}
-            className={`toggle-button ${selectedTypes.includes(type) ? 'active' : ''}`}
+            className={`toggle-button ${
+              selectedTypes.includes(type) ? "active" : ""
+            }`}
             onClick={() => toggleType(type)}
             type="button"
           >
@@ -46,7 +49,7 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm('Voulez-vous vraiment supprimer ce vœu ?')) {
+    if (window.confirm("Voulez-vous vraiment supprimer ce vœu ?")) {
       onDelete(index);
     }
   };
@@ -54,8 +57,10 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
   return (
     <div className="form-card">
       <div className="WishList-header">
-        <h3>{isExtra ? 'Heures Supplémentaires' : `Vœu ${index + 1}`}</h3>
-        <button className="delete-btn" onClick={handleDelete}>Supprimer</button>
+        <h3>{isExtra ? "Heures Supplémentaires" : `Vœu ${index + 1}`}</h3>
+        <button className="delete-btn" onClick={handleDelete}>
+          Supprimer
+        </button>
       </div>
 
       {/* Champ pour le nom du module */}
@@ -78,7 +83,7 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
           <input
             type="text"
             placeholder="Ex : L3, M1, etc."
-            value={wish.niveau || ''}
+            value={wish.niveau || ""}
             onChange={handleNiveauChange}
           />
         </div>
@@ -96,16 +101,25 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
 function WishList() {
   const [wishList, setWishList] = useState([]);
   const [extraWish, setExtraWish] = useState(null);
-  const [saveMessage, setSaveMessage] = useState('');
+  const [saveMessage, setSaveMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    setWishList([]);
+    const savedWishes = localStorage.getItem("voeux");
+    if (savedWishes) {
+      const parsedWishes = JSON.parse(savedWishes);
+      const mainWishes = parsedWishes.slice(0, 3);
+      const extra = parsedWishes.length > 3 ? parsedWishes[3] : null;
+      setWishList(mainWishes);
+      setExtraWish(extra);
+    } else {
+      setWishList([]);
+    }
   }, []);
 
   const addWish = () => {
     if (wishList.length >= 3) return;
-    setWishList([...wishList, { module: '', niveau: '', teachingTypes: [] }]);
+    setWishList([...wishList, { module: "", niveau: "", teachingTypes: [] }]);
   };
 
   const updateWish = (index, updatedWish) => {
@@ -120,7 +134,7 @@ function WishList() {
   };
 
   const addExtraWish = () => {
-    setExtraWish({ module: '', niveau: '', teachingTypes: [] });
+    setExtraWish({ module: "", niveau: "", teachingTypes: [] });
   };
 
   const updateExtraWish = (_, updatedWish) => {
@@ -131,20 +145,24 @@ function WishList() {
     const allWishes = [...wishList];
     if (extraWish) allWishes.push(extraWish);
 
-    localStorage.setItem('voeux', JSON.stringify(allWishes));
-    setSaveMessage('✅ Vœux enregistrés avec succès !');
-    setTimeout(() => setSaveMessage(''), 3000);
+    localStorage.setItem("voeux", JSON.stringify(allWishes));
+    setSaveMessage("✅ Vœux enregistrés avec succès !");
+    setTimeout(() => setSaveMessage(""), 3000);
   };
 
   const handleBack = () => {
-    navigate('/dashboardtec');
+    navigate("/dashboardtec");
   };
 
   return (
     <div className="wishlist-container">
-      <button className="back-button" onClick={handleBack}>← Retour</button>
+      <button className="back-button" onClick={handleBack}>
+        <FaArrowLeft className="icon" size={12} /> Retour
+      </button>
       <h1 className="title">Liste de Vœux</h1>
-      <p className="subtitle">Gérez vos souhaits d’enseignement pour l’année à venir</p>
+      <p className="subtitle">
+        Gérez vos souhaits d’enseignement pour l’année à venir
+      </p>
 
       {wishList.map((wish, index) => (
         <WishItem
@@ -168,18 +186,20 @@ function WishList() {
 
       <div className="buttons-container">
         {wishList.length < 3 && (
-          <button className="add-button" onClick={addWish}>+ Nouveau vœu</button>
+          <button className="add-button" onClick={addWish}>
+            <FaPlus className="icon" size={12} /> Nouveau vœu
+          </button>
         )}
 
         {wishList.length > 0 && (
           <button className="save-button" onClick={saveWishes}>
-            💾 Enregistrer les vœux
+            <FaSave className="icon" size={12} /> Enregistrer les vœux
           </button>
         )}
 
         {wishList.length === 3 && !extraWish && (
           <button className="extra-button" onClick={addExtraWish}>
-            ➕ Heures supplémentaires
+            <FaPlus className="icon" size={12} /> Heures supplémentaires
           </button>
         )}
       </div>
@@ -190,9 +210,7 @@ function WishList() {
         </p>
       )}
 
-      {saveMessage && (
-        <p className="save-message">{saveMessage}</p>
-      )}
+      {saveMessage && <p className="save-message">{saveMessage}</p>}
     </div>
   );
 }

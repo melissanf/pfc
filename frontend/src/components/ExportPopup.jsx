@@ -1,6 +1,6 @@
 // components/ExportPopup.jsx
-import React from 'react';
-import './ExportPopup.css';
+import React from "react";
+import "./ExportPopup.css";
 
 const ExportPopup = ({ onClose, onExport }) => {
   const handleExportClick = (fileType) => {
@@ -12,18 +12,18 @@ const ExportPopup = ({ onClose, onExport }) => {
     <div className="popup-overlay">
       <div className="popup-container">
         <h3>Choisissez le format d'exportation</h3>
-        
+
         <div className="popup-buttons">
           <button
             className="button-excel"
-            onClick={() => handleExportClick('excel')}
+            onClick={() => handleExportClick("excel")}
           >
             Exporter en Excel
           </button>
-          
+
           <button
             className="button-pdf"
-            onClick={() => handleExportClick('pdf')}
+            onClick={() => handleExportClick("pdf")}
           >
             Exporter en PDF
           </button>
