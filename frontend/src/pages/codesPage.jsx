@@ -6,9 +6,9 @@ import CodePopup from "../components/CodePopup";
 const CodesPage = () => {
   const [role, setRole] = useState("");
   const [codes, setCodes] = useState([
-    { code: "E0054", role: "enseignant" },
-    { code: "S0444", role: "staffAdministrateur" },
-    { code: "De005", role: "chefDepartement" },
+    { code: "EMB0001", role: "enseignant" },
+    { code: "PMN003", role: "staffAdministrateur" },
+    { code: "DFM000", role: "chefDepartement" },
   ]);
 
   const [showPopup, setShowPopup] = useState(false);
