@@ -17,6 +17,7 @@ import TeacherTableManagment from "./pages/TeacherTableManagment";
 import OrganigrammePage from "./pages/OrganigrammePage";
 import Dashboardorga from "./components/Dashboardorga"; // Chef / Staff
 import Dashboardtec from "./components/Dashboardtec"; // Enseignant
+import CodesPage from "./pages/codesPage";
 
 // Wrapper animation page transitions
 const PageWrapper = ({ children }) => (
@@ -178,6 +179,18 @@ const App = () => {
             <PageWrapper>
               <Dashboardorga userRole={role} />
             </PageWrapper>
+          }
+        />
+        <Route
+          path="/codes"
+          element={
+            role === "chefDepartement" ? (
+              <PageWrapper>
+                <CodesPage />
+              </PageWrapper>
+            ) : (
+              <Navigate to="/" replace />
+            )
           }
         />
 

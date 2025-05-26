@@ -26,15 +26,40 @@ const TeacherTableManagment = () => {
   }, []);
 
   const [teachers, setTeachers] = useState([
-    { nom: 'Sara Bouzid', specialite: 'Informatique', semestre: 'S3', module: 'Programmation web' },
-    { nom: 'Rami Benaissa', specialite: 'Mathématiques', semestre: 'S3', module: 'Probabilités' },
-    { nom: 'Yasmine Armani', specialite: 'IA', semestre: 'S4', module: 'Machine Learning' },
-    { nom: 'Lina Hadj-Messaoud', specialite: 'Informatique', semestre: 'S4', module: 'Java Avancé' },
-    { nom: 'Karim Mansour', specialite: 'Réseaux', semestre: 'S3', module: 'Réseaux 2' },
+    {
+      nom: "Sara Bouzid",
+      specialite: "Informatique",
+      semestre: "S3",
+      module: "Programmation web",
+    },
+    {
+      nom: "Rami Benaissa",
+      specialite: "Mathématiques",
+      semestre: "S3",
+      module: "Probabilités",
+    },
+    {
+      nom: "Yasmine Armani",
+      specialite: "IA",
+      semestre: "S4",
+      module: "Machine Learning",
+    },
+    {
+      nom: "Lina Hadj-Messaoud",
+      specialite: "Informatique",
+      semestre: "S4",
+      module: "Java Avancé",
+    },
+    {
+      nom: "Karim Mansour",
+      specialite: "Réseaux",
+      semestre: "S3",
+      module: "Réseaux 2",
+    },
   ]);
 
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showExportPopup, setShowExportPopup] = useState(false);

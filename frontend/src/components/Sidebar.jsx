@@ -169,8 +169,77 @@ const Sidebar = () => {
         {/* Menu pour Chef de Département (inclut menu admin + spécifiques) */}
         {userRole === "chefDepartement" && (
           <>
-            {renderAdminMenu()}
-            {renderDepartmentHeadMenu()}
+            <div
+              className={`menu-item ${
+                isActive("/dashboardorga") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/dashboardorga")}
+            >
+              <FiLayout size={18} />
+              <span>Tableau de bord</span>
+            </div>
+
+            <div
+              className={`menu-item ${
+                isActive("/enseignants") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/enseignants")}
+            >
+              <FiUser size={18} />
+              <span>Enseignants</span>
+            </div>
+
+            <div
+              className={`menu-item ${isActive("/modules") ? "active" : ""}`}
+              onClick={() => handleNavigate("/modules")}
+            >
+              <FiBookOpen size={18} />
+              <span>Modules</span>
+            </div>
+
+            <div
+              className={`menu-item ${
+                isActive("/organigramme") ? "active" : ""
+              }`}
+              onClick={() => handleNavigate("/organigramme")}
+            >
+              <FiUsers size={18} />
+              <span>Organigramme</span>
+            </div>
+
+            {userRole === "chefDepartement" && (
+              <div
+                className={`menu-item ${
+                  isActive("/commentaires") ? "active" : ""
+                }`}
+                onClick={() => handleNavigate("/commentaires")}
+              >
+                <FiMessageSquare size={18} />
+                <span>Commentaires</span>
+              </div>
+            )}
+
+            {userRole === "chefDepartement" && (
+              <div
+                className={`menu-item ${isActive("/codes") ? "active" : ""}`}
+                onClick={() => handleNavigate("/codes")}
+              >
+                <FiBookOpen size={18} />
+                <span>Codes</span>
+              </div>
+            )}
+
+            {userRole === "chefDepartement" && (
+              <div
+                className={`menu-item ${
+                  isActive("/parametre") ? "active" : ""
+                }`}
+                onClick={() => handleNavigate("/parametre")}
+              >
+                <FiSettings size={18} />
+                <span>Paramètres</span>
+              </div>
+            )}
           </>
         )}
 

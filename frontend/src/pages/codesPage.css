@@ -1,0 +1,65 @@
+.codes-page {
+  display: flex;
+}
+
+.codes-sidebar {
+  width: 350px;
+}
+
+.codes-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.codes-buttons {
+  margin-bottom: 20px;
+}
+
+.codes-buttons button {
+  margin-right: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.codes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.codes-table th,
+.codes-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.codes-table th {
+  background-color: #f4f4f4;
+}
+
+.code-form {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  width: 300px;
+  border-radius: 8px;
+}
+
+.code-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.code-form input,
+.code-form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
