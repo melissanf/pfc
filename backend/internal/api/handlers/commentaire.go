@@ -10,12 +10,23 @@ import (
 )
 func CreateCommentaire(w http.ResponseWriter, r *http.Request) {
 	var commentaire models.Commentaire
+	type contenue struct{
+		i string 
+	}
+	var contenue contenue 
 	db := database.GetDB()
-	if err := json.NewDecoder(r.Body).Decode(&commentaire); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&contenue); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	claims, ok := r.Context().Value("user").(*models.Claims)
+	if !ok {
+		http.Error(w, "Erreur de récupération des claims", http.StatusInternalServerError)
+		return
+	}
 
+	commentaire.Contenue=contenue
+	commentaire.AutheurID	= claims.ID
 	if _,err := services.CreateCommentaire(db, &commentaire); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

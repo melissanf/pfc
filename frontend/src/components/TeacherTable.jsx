@@ -16,7 +16,7 @@ const TeacherTable = ({ teachers, onEdit, onDelete, role }) => {
 
   // Ouvrir popup avec voeux de l'enseignant uniquement si role = 'chef departement'
   const handleNomClick = (teacherNom) => {
-    if (role !== 'chef departement') return;  // Si pas chef departement, on n'ouvre pas la popup
+    if (role !== 'chefDepartement') return;  // Si pas chef departement, on n'ouvre pas la popup
 
     // Récupérer tous les voeux stockés localement
     const allVoeux = JSON.parse(localStorage.getItem('voeux')) || [];
@@ -37,7 +37,7 @@ const TeacherTable = ({ teachers, onEdit, onDelete, role }) => {
             <th>Spécialité concernée</th>
             <th>Semestre</th>
             <th>Module</th>
-            {role === 'chef departement' && <th>Actions</th>}
+            {role === 'chefDepartement' && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -45,10 +45,10 @@ const TeacherTable = ({ teachers, onEdit, onDelete, role }) => {
             <tr key={index} style={{ cursor: 'default' }}>
               <td
                 onClick={() => handleNomClick(teacher.nom)}
-                style={ role === 'chef departement'
+                style={ role === 'chefDepartement'
                   ? { cursor: 'pointer', color: 'blue', textDecoration: 'underline' }
                   : {} }
-                title={ role === 'chef departement'
+                title={ role === 'chefDepartement'
                   ? "Voir la liste des vœux de cet enseignant"
                   : undefined }
               >
@@ -57,7 +57,7 @@ const TeacherTable = ({ teachers, onEdit, onDelete, role }) => {
               <td>{teacher.specialite}</td>
               <td>{teacher.semestre}</td>
               <td>{teacher.module}</td>
-              {role === 'chef departement' && (
+              {role === 'chefDepartement' && (
                 <td>
                   <button
                     className="exchange-btn"
@@ -85,7 +85,7 @@ const TeacherTable = ({ teachers, onEdit, onDelete, role }) => {
       </table>
 
       {/* Afficher la popup uniquement si role = chef departement */}
-      {role === 'chef departement' && (
+      {role === 'chefDepartement' && (
         <WishlistPopup
           isOpen={popupOpen}
           onClose={() => setPopupOpen(false)}

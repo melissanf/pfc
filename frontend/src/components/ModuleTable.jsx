@@ -25,7 +25,7 @@ const ModuleTable = ({ modules, onEdit, onDelete, role }) => {
           <th>Spécialité concernée</th>
           <th>Semestre</th>
           <th>Enseignant responsable</th>
-          {role === 'chef departement' && <th>Actions</th>}
+          {role === 'chefDepartement' && <th>Actions</th>}
         </tr>
       </thead>
       <tbody>
@@ -38,7 +38,7 @@ const ModuleTable = ({ modules, onEdit, onDelete, role }) => {
             <td>{mod.specialite}</td>
             <td>{mod.semestre}</td>
             <td>{mod.enseignant}</td>
-            {role === 'chef departement' && (
+            {role === 'chefDepartement' && (
               <td>
                 <button
                   className="exchange-btn"

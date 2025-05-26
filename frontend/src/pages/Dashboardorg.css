@@ -1,53 +1,261 @@
+/* ===== CONTAINER PRINCIPAL ===== */
 .dashboard-container {
-    padding: 40px;
-    flex: 1;
-    background-color: #fff;
+  padding: 2.5rem;
+  flex: 1;
+  background-color: #ffffff;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===== BOUTONS ===== */
+.organigram-btn {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.organigram-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.organigram-btn:hover {
+  background: linear-gradient(135deg, #357abd 0%, #2968a3 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+}
+
+.organigram-btn:hover::before {
+  left: 100%;
+}
+
+.organigram-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s;
+}
+
+/* ===== ALERTES ===== */
+.alert {
+  background: linear-gradient(135deg, #a6c6d8 0%, #8bb5d1 100%);
+  color: white;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #4a90e2;
+  box-shadow: 0 4px 12px rgba(166, 198, 216, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4a90e2, #357abd, #4a90e2);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== BOUTONS D'ACTION ===== */
+.actions,
+.quick-access {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.actions button,
+.quick-access button {
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.actions button::before,
+.quick-access button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.actions button:hover,
+.quick-access button:hover {
+  border-color: #4a90e2;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.2);
+}
+
+.actions button:hover::before,
+.quick-access button:hover::before {
+  opacity: 1;
+}
+
+.actions button:focus,
+.quick-access button:focus {
+  outline: none;
+  ring: 3px;
+  ring-color: rgba(74, 144, 226, 0.3);
+  ring-offset: 2px;
+}
+
+/* ===== STATISTIQUES ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.stats > div {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stats > div::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4a90e2, #357abd, #4a90e2);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.stats > div:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  border-color: #4a90e2;
+}
+
+.stats > div:hover::before {
+  transform: translateX(0);
+}
+
+.stats h3 {
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.stats p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1.5rem;
   }
   
-  .organigram-btn {
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .organigram-btn:hover {
-    background-color: #084298;
-  }
-  
-  .alert {
-    background-color: #A6C6D8;
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+  .actions,
+  .quick-access {
+    flex-direction: column;
   }
   
   .actions button,
   .quick-access button {
-    margin: 10px;
-    padding: 10px 20px;
-    border: 1px solid #333;
-    border-radius: 6px;
-    background-color: white;
-    cursor: pointer;
+    width: 100%;
+    justify-content: center;
   }
   
   .stats {
-    display: flex;
-    gap: 40px;
-    margin-top: 20px;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
-  .stats div {
-    background-color: #f2f2f2;
-    padding: 15px;
-    border-radius: 8px;
+  .organigram-btn {
+    width: 100%;
     text-align: center;
   }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
   
+  .stats > div {
+    padding: 1rem;
+  }
+  
+  .stats p {
+    font-size: 1.5rem;
+  }
+}
+
+/* ===== ACCESSIBILITÉ ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== ÉTATS FOCUS POUR ACCESSIBILITÉ ===== */
+.organigram-btn:focus-visible,
+.actions button:focus-visible,
+.quick-access button:focus-visible {
+  outline: 3px solid #4a90e2;
+  outline-offset: 2px;
+}

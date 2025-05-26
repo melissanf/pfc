@@ -21,9 +21,7 @@ const TeachingTypeSelector = ({ selectedTypes = [], onChange }) => {
         {types.map((type) => (
           <button
             key={type}
-            className={`toggle-button ${
-              selectedTypes.includes(type) ? "active" : ""
-            }`}
+            className={`toggle-button ${selectedTypes.includes(type) ? "active" : ""}`}
             onClick={() => toggleType(type)}
             type="button"
           >
@@ -63,7 +61,6 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
         </button>
       </div>
 
-      {/* Champ pour le nom du module */}
       <div className="form-row">
         <div className="form-group">
           <label>Nom du module</label>
@@ -76,7 +73,6 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
         </div>
       </div>
 
-      {/* Champ pour le niveau */}
       <div className="form-row">
         <div className="form-group">
           <label>Niveau</label>
@@ -89,7 +85,6 @@ const WishItem = ({ index, wish, onUpdate, onDelete, isExtra = false }) => {
         </div>
       </div>
 
-      {/* Sélection du type d’enseignement */}
       <TeachingTypeSelector
         selectedTypes={wish.teachingTypes}
         onChange={handleTypesChange}
@@ -104,17 +99,37 @@ function WishList() {
   const [saveMessage, setSaveMessage] = useState("");
   const navigate = useNavigate();
 
+  const handleBack = () => {
+    navigate("/dashboardtec"); // Modifie la route si besoin
+  };
+
   useEffect(() => {
-    const savedWishes = localStorage.getItem("voeux");
-    if (savedWishes) {
-      const parsedWishes = JSON.parse(savedWishes);
-      const mainWishes = parsedWishes.slice(0, 3);
-      const extra = parsedWishes.length > 3 ? parsedWishes[3] : null;
-      setWishList(mainWishes);
-      setExtraWish(extra);
-    } else {
-      setWishList([]);
-    }
+    fetch("http://localhost:8000/Enseignant/fiche-de-voeux")
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur réseau");
+        return res.json();
+      })
+      .then((data) => {
+        const wishes = data.map((item) => ({
+          module: item.module_name,
+          niveau: item.niveau_name,
+          teachingTypes: [
+            item.cour && "Cours",
+            item.td && "TD",
+            item.tp && "TP",
+          ].filter(Boolean),
+          isExtra: item.hr === true,
+        }));
+
+        const mainWishes = wishes.filter(w => !w.isExtra).slice(0, 3);
+        const extra = wishes.find(w => w.isExtra);
+
+        setWishList(mainWishes);
+        setExtraWish(extra || null);
+      })
+      .catch((err) => {
+        console.error("Erreur lors du chargement des vœux depuis l'API:", err);
+      });
   }, []);
 
   const addWish = () => {
@@ -141,19 +156,113 @@ function WishList() {
     setExtraWish(updatedWish);
   };
 
-  const saveWishes = () => {
-    const allWishes = [...wishList];
-    if (extraWish) allWishes.push(extraWish);
+const saveWishes = async () => {
+  const allWishes = [...wishList];
+  if (extraWish) allWishes.push({ ...extraWish, hr: true });
 
-    localStorage.setItem("voeux", JSON.stringify(allWishes));
+  // Validation
+  const hasEmptyFields = allWishes.some(
+    (wish) =>
+      !wish.module?.trim() ||
+      !wish.niveau?.trim() ||
+      wish.teachingTypes.length === 0
+  );
+  
+  if (hasEmptyFields) {
+    setSaveMessage("❗ Veuillez remplir tous les champs avant d'enregistrer.");
+    setTimeout(() => setSaveMessage(""), 3000);
+    return;
+  }
+
+  // Format pour API
+  const payload = allWishes.map((wish) => ({
+    module_name: wish.module,
+    niveau_name: wish.niveau,
+    cour: wish.teachingTypes.includes("Cours"),
+    td: wish.teachingTypes.includes("TD"),
+    tp: wish.teachingTypes.includes("TP"),
+    hr: wish.hr || false,
+  }));
+
+  try {
+    const token = localStorage.getItem('authToken') || 
+                  localStorage.getItem('token') || 
+                  localStorage.getItem('accessToken');
+    
+    const userRole = localStorage.getItem('userRole');
+    const userId = localStorage.getItem('userId') || localStorage.getItem('user_id');
+
+    if (!token) {
+      setSaveMessage("❌ Token d'authentification manquant. Veuillez vous reconnecter.");
+      return;
+    }
+
+    console.log("User role:", userRole);
+    console.log("User ID:", userId);
+    console.log("Payload:", JSON.stringify(payload, null, 2));
+
+    // Headers enrichis avec plus d'informations
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    };
+
+    // Ajouter des headers supplémentaires si disponibles
+    if (userRole) {
+      headers["X-User-Role"] = userRole;
+    }
+    if (userId) {
+      headers["X-User-ID"] = userId;
+    }
+
+    console.log("Headers envoyés:", headers);
+
+    const response = await fetch("http://localhost:8000/Enseignant/fiche-de-voeux", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(payload),
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log("Error response:", errorText);
+      
+      let errorMessage;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorData.detail || errorData.error;
+      } catch (e) {
+        errorMessage = errorText;
+      }
+
+      if (response.status === 401) {
+        setSaveMessage("❌ Token expiré. Veuillez vous reconnecter.");
+      } else if (response.status === 403) {
+        setSaveMessage(`❌ Accès refusé: ${errorMessage || 'Permissions insuffisantes'}`);
+      } else {
+        setSaveMessage(`❌ Erreur ${response.status}: ${errorMessage}`);
+      }
+      return;
+    }
+
+    const responseData = await response.json();
+    console.log("Success response:", responseData);
+
+    // Succès
+    setWishList([]);
+    setExtraWish(null);
     setSaveMessage("✅ Vœux enregistrés avec succès !");
     setTimeout(() => setSaveMessage(""), 3000);
-  };
 
-  const handleBack = () => {
-    navigate("/dashboardtec");
-  };
-
+  } catch (error) {
+    console.error("Network error:", error);
+    setSaveMessage(`❌ Erreur réseau: ${error.message}`);
+    setTimeout(() => setSaveMessage(""), 5000);
+  }
+};
   return (
     <div className="wishlist-container">
       <button className="back-button" onClick={handleBack}>

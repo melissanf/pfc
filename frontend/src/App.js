@@ -37,9 +37,14 @@ const App = () => {
   useEffect(() => {
     const userString = localStorage.getItem("user");
     if (userString) {
-      const user = JSON.parse(userString);
-      const role = user.role;
-      setRole(role);
+      try {
+        const user = JSON.parse(userString);
+        const role = user.role;
+        setRole(role);
+        console.log("Rôle chargé:", role); // Debug
+      } catch (error) {
+        console.error("Erreur parsing user:", error);
+      }
     } else {
       console.warn("Aucun utilisateur trouvé dans le local storage.");
     }
@@ -47,13 +52,17 @@ const App = () => {
 
   const handleRoleChange = (newRole) => {
     const userString = localStorage.getItem("user");
-    console.log("userString");
+    console.log("Changement de rôle vers:", newRole);
     if (userString) {
-      const user = JSON.parse(userString);
-      user.role = newRole;
-      localStorage.setItem("user", JSON.stringify(user));
+      try {
+        const user = JSON.parse(userString);
+        user.role = newRole;
+        localStorage.setItem("user", JSON.stringify(user));
+        setRole(newRole);
+      } catch (error) {
+        console.error("Erreur lors du changement de rôle:", error);
+      }
     }
-    setRole(newRole);
   };
 
   return (
@@ -106,10 +115,12 @@ const App = () => {
             </PageWrapper>
           }
         />
+        
+        {/* CORRECTION: Seuls les chefs de département peuvent accéder aux commentaires */}
         <Route
           path="/commentaires"
           element={
-            role != "chefDepartement" ? (
+            role === "chefDepartement" ? (
               <PageWrapper>
                 <Commentaires />
               </PageWrapper>
@@ -118,6 +129,7 @@ const App = () => {
             )
           }
         />
+        
         <Route
           path="/wishlist"
           element={
@@ -175,4 +187,5 @@ const App = () => {
     </AnimatePresence>
   );
 };
+
 export default App;

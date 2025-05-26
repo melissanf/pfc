@@ -32,6 +32,15 @@ func GetUserByEmail(db *gorm.DB, email string) (*models.User, error) {
 func UpdateUser(db *gorm.DB, user *models.User) error {
     return db.Save(user).Error
 }
+// GetUserByName trouve un utilisateur par son nom (si cette méthode n'existe pas déjà)
+func GetUserByName(db *gorm.DB, name string) (*models.User, error) {
+	var user models.User
+	err := db.Where("nom = ? OR username = ?", name, name).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
 
 // DeleteUser supprime un utilisateur de la base de données.
 func DeleteUser(db *gorm.DB, id uint) error {

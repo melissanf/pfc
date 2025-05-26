@@ -19,12 +19,21 @@ func NewRouter() *mux.Router {
     ProfRouter.HandleFunc("/profile", handlers.HandelProfile).Methods("GET")
     ProfRouter.HandleFunc("/fiche-de-voeux", handlers.Fiche_de_voeux).Methods("POST")
     ProfRouter.HandleFunc("/fiche-de-voeux", handlers.GetVoeuxByTeacherID).Methods("GET")
-    ProfRouter.HandleFunc("/commentaire", handlers.CreateCommentaire).Methods("GET", "POST")
     ProfRouter.HandleFunc("/modules", handlers.GetAllModules).Methods("GET")
+    ProfRouter.HandleFunc("/notifications", handlers.GetNotifications).Methods("GET")
+    ProfRouter.HandleFunc("/notifications/user/{userID}", handlers.GetNotifications).Methods("GET")
+    ProfRouter.HandleFunc("/notifications/{id}/read", handlers.MarkNotificationAsRead).Methods("PUT", "PATCH")
+    ProfRouter.HandleFunc("/notifications/user/{userID}/read-all", handlers.MarkAllNotificationsAsRead).Methods("PUT", "PATCH")
+    ProfRouter.HandleFunc("/notifications/{id}", handlers.DeleteNotification).Methods("DELETE")
+    ProfRouter.HandleFunc("/notifications", handlers.CreateSingleNotification).Methods("POST")
+    ProfRouter.HandleFunc("/Notif", handlers.CreateOrganigrammeNotifications).Methods("POST") 
+
+    staffRouter := router.PathPrefix("/staff").Subrouter()
+    staffRouter.HandleFunc("/commentaire", handlers.CreateCommentaire).Methods("POST")
 
     // Routes protégées par JWT et rôle admin pour les utilisateurs
     adminRouter := router.PathPrefix("/admin").Subrouter()
-    adminRouter.Use(middleware.IsAdmin)
+    adminRouter.Use(middleware.IsAdmin) 
 
     // Routes pour les utilisateurs, accessibles uniquement par l'admin
     adminRouter.HandleFunc("/users", handlers.GetAllUsers).Methods("GET")
